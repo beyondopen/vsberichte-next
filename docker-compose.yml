@@ -1,0 +1,47 @@
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - ./data:/data
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+      DATA_DIR: /data
+      WORKER_URL: http://worker:8000
+    depends_on:
+      - db
+  db:
+    image: postgres:16-alpine
+    volumes:
+      - ./data/dbdata:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_PASSWORD: password
+  worker:
+    build: ./scripts
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/data
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+      DATA_DIR: /data
+      PAYLOAD_URL: ${PAYLOAD_URL:-http://web:3000}
+      PAYLOAD_API_KEY: ${PAYLOAD_API_KEY:-}
+    depends_on:
+      - db
+    command: ["uvicorn", "worker:app", "--host", "0.0.0.0", "--port", "8000"]
+  cli:
+    build: ./scripts
+    volumes:
+      - ./data:/data
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/postgres
+      DATA_DIR: /data
+    depends_on:
+      - db
+    profiles:
+      - cli

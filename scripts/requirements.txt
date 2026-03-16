@@ -1,0 +1,11 @@
+clean-text==0.1.1
+fastapi
+pdf2image==1.5.4
+pdfplumber==0.11.9
+pdftotext==2.1.1
+Pillow==12.1.1
+psycopg2-binary==2.9.10
+reportlab==4.4.0
+requests
+spacy==3.7.5
+uvicorn[standard]
