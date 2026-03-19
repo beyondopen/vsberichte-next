@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SearchForm from "@/components/SearchForm";
+import HomepageChart from "@/components/HomepageChart";
 import {
   getDocumentCount,
   getJurisdictionCount,
@@ -227,31 +228,19 @@ export default async function HomePage() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* Chart 1 */}
             <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
-              <h3 className="font-bold mb-1">
-                Erw&auml;hnungen von RAF und NSU
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Bundesberichte, 1990&ndash;2023
-              </p>
-              <div className="h-56 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center">
-                <span className="text-sm text-gray-400 dark:text-gray-500">
-                  Interaktiver Chart mit JavaScript
-                </span>
-              </div>
+              <HomepageChart
+                title="Erw&auml;hnungen von RAF und NSU"
+                subtitle="Bundesberichte, 1990&ndash;2023"
+                queries={['raf', 'nsu']}
+              />
             </div>
             {/* Chart 2 */}
             <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
-              <h3 className="font-bold mb-1">
-                Erw&auml;hnungen von Parteien
-              </h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-                Alle Berichte, 2000&ndash;2023
-              </p>
-              <div className="h-56 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center">
-                <span className="text-sm text-gray-400 dark:text-gray-500">
-                  Interaktiver Chart mit JavaScript
-                </span>
-              </div>
+              <HomepageChart
+                title="Erw&auml;hnungen von Parteien"
+                subtitle="Alle Berichte, 2000&ndash;2023"
+                queries={['npd', 'pkk', 'dkp']}
+              />
             </div>
           </div>
         </div>

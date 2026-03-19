@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { getTermStats } from '@/lib/queries/stats'
+import TrendChart from '@/components/TrendChart'
 
 export const dynamic = 'force-dynamic'
 
@@ -186,16 +187,8 @@ export default async function TrendsPage({ searchParams }: TrendsPageProps) {
                   `, ${sortedYears[0]}\u2013${sortedYears[sortedYears.length - 1]}`}
               </p>
 
-              {/* Chart placeholder */}
-              <div
-                id="trends-chart"
-                className="h-80 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center"
-                data-stats={JSON.stringify(statsData)}
-              >
-                <p className="text-sm text-gray-400 dark:text-gray-500">
-                  Interaktiver Chart wird mit JavaScript geladen
-                </p>
-              </div>
+              {/* Interactive Chart */}
+              <TrendChart statsData={statsData} terms={terms} />
             </div>
           </div>
         </section>
