@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Impressum -- Verfassungsschutzberichte.de',
+  robots: { index: false, follow: true },
 }
 
 export default function ImpressumPage() {

@@ -8,6 +8,9 @@ export const metadata: Metadata = {
   title: 'Regionale Analyse -- Verfassungsschutzberichte.de',
   description:
     'Vergleiche Erwaehnungen von Begriffen ueber alle Bundeslaender und Jahre hinweg.',
+  openGraph: {
+    images: [{ url: '/thumbnail_regional.jpg' }],
+  },
 }
 
 interface RegionalPageProps {

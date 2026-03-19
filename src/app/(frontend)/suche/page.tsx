@@ -4,12 +4,14 @@ import { searchDocumentPages, extractSearchTokens } from '@/lib/queries/search'
 import { getHighlightBoxes } from '@/lib/wordpos'
 import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
 import Pagination from '@/components/Pagination'
+import SearchResultImage from '@/components/SearchResultImage'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Suche -- Verfassungsschutzberichte.de',
   description: 'Durchsuche alle Verfassungsschutzberichte von Bund und Laendern im Volltext.',
+  robots: { index: false, follow: false },
 }
 
 interface SearchPageProps {
@@ -202,23 +204,12 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
                     className="border border-gray-200 dark:border-gray-800 rounded-xl p-6"
                   >
                     <div className="flex flex-col sm:flex-row gap-6">
-                      {/* Thumbnail with highlight boxes */}
-                      <div className="relative w-40 h-56 bg-gray-100 dark:bg-gray-800 rounded-lg flex-shrink-0 overflow-hidden">
-                        {result.highlight_boxes.map((box, i) => (
-                          <div
-                            key={i}
-                            className="absolute"
-                            style={{
-                              top: `${box.y * 100}%`,
-                              left: `${box.x * 100}%`,
-                              width: `${box.w * 100}%`,
-                              height: `${box.h * 100}%`,
-                              background: 'rgba(250, 204, 21, 0.35)',
-                              borderRadius: '2px',
-                            }}
-                          />
-                        ))}
-                      </div>
+                      {/* Thumbnail with highlight boxes — click to expand */}
+                      <SearchResultImage
+                        src={result.file_url}
+                        alt={`Seite ${result.page_number} — ${result.jurisdiction} ${result.year}`}
+                        highlightBoxes={result.highlight_boxes}
+                      />
                       {/* Content */}
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-2">

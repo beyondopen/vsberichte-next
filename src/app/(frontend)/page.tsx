@@ -729,14 +729,26 @@ export default async function HomePage() {
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
               Erhalte Updates zu neuen Berichten und Analysen.
             </p>
-            <form className="flex gap-3">
+            <form
+              method="post"
+              action="https://listen.daten.cool/subscription/form"
+              className="flex gap-3"
+            >
+              <input type="hidden" name="nonce" />
+              <input
+                type="hidden"
+                name="l"
+                value="4539a1e9-ea50-4a91-bd6e-6730ea3eedd0"
+              />
               <label htmlFor="email-input" className="sr-only">
                 E-Mail-Adresse
               </label>
               <input
                 id="email-input"
                 type="email"
+                name="email"
                 placeholder="name@beispiel.de"
+                required
                 className="flex-1 px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
               <button

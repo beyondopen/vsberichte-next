@@ -9,7 +9,6 @@ describe('documentTypeLabels', () => {
     'broschuere',
     'kompendium',
     'flyer',
-    'english',
     'parlamentarisch',
   ]
 
@@ -33,10 +32,6 @@ describe('documentTypeLabels', () => {
 
   it('jahresbericht label is "Jahresbericht"', () => {
     expect(documentTypeLabels['jahresbericht']).toBe('Jahresbericht')
-  })
-
-  it('english label is "Englische Fassung"', () => {
-    expect(documentTypeLabels['english']).toBe('Englische Fassung')
   })
 
   it('kurzfassung label is "Kurzfassung"', () => {

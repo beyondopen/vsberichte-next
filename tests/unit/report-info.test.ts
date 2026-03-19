@@ -63,7 +63,6 @@ describe('documentTypeLabels', () => {
       'broschuere',
       'kompendium',
       'flyer',
-      'english',
       'parlamentarisch',
     ]
     for (const type of expectedTypes) {

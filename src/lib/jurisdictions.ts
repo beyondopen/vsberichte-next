@@ -12,6 +12,10 @@ export function jurisdictionToSlug(jurisdiction: string): string {
 export function slugToJurisdiction(slug: string): string {
   const decoded = decodeURIComponent(slug)
   // "baden-württemberg" -> "Baden-Württemberg", "nordrhein-westfalen" -> "Nordrhein-Westfalen"
-  // Matches Python's .title() behavior: capitalize first letter of each word
-  return decoded.replace(/\b\w/g, c => c.toUpperCase())
+  // Capitalize the first letter after start-of-string or a hyphen.
+  // Uses a simple split approach to avoid \b regex issues with Unicode (ü, ö, etc.)
+  return decoded
+    .split('-')
+    .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+    .join('-')
 }

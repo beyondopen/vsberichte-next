@@ -41,12 +41,9 @@ describe('slugToJurisdiction', () => {
     expect(slugToJurisdiction('bund')).toBe('Bund')
   })
 
-  it('converts encoded slug back to a string starting with "Baden"', () => {
+  it('converts encoded slug back to "Baden-Württemberg"', () => {
     const result = slugToJurisdiction('baden-w%C3%BCrttemberg')
-    expect(result).toContain('Baden')
-    // Note: \b\w regex treats the char after ü as a word boundary,
-    // so the R gets capitalized: "Baden-WüRttemberg"
-    expect(result).toContain('Wü')
+    expect(result).toBe('Baden-Württemberg')
   })
 
   it('capitalizes first letter of each word', () => {
@@ -55,26 +52,15 @@ describe('slugToJurisdiction', () => {
 })
 
 describe('round-trip slug conversion', () => {
-  it('preserves jurisdiction for simple cases', () => {
-    const simpleCases = ['Bund', 'Bayern', 'Berlin', 'Bremen', 'Hamburg', 'Hessen', 'Saarland', 'Sachsen']
-    for (const j of simpleCases) {
+  it('preserves jurisdiction for all entries', () => {
+    for (const j of jurisdictions) {
       expect(slugToJurisdiction(jurisdictionToSlug(j))).toBe(j)
     }
   })
 
-  it('preserves jurisdiction for hyphenated names', () => {
-    const hyphenated = ['Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Schleswig-Holstein', 'Sachsen-Anhalt']
-    for (const j of hyphenated) {
-      expect(slugToJurisdiction(jurisdictionToSlug(j))).toBe(j)
-    }
-  })
-
-  it('round-trips "Baden-Württemberg" with known casing quirk', () => {
-    // The \b\w regex in slugToJurisdiction treats the char after ü as a word
-    // boundary, so round-trip produces "Baden-WüRttemberg" instead of the original.
-    // This documents the current behavior.
+  it('round-trips "Baden-Württemberg" correctly', () => {
     const original = 'Baden-Württemberg'
     const roundTripped = slugToJurisdiction(jurisdictionToSlug(original))
-    expect(roundTripped).toBe('Baden-WüRttemberg')
+    expect(roundTripped).toBe('Baden-Württemberg')
   })
 })

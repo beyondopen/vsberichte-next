@@ -23,6 +23,7 @@ export async function generateMetadata({
   return {
     title: `Verfassungsschutzbericht ${jurisdiction} ${year} -- Verfassungsschutzberichte.de`,
     description: `Verfassungsschutzbericht ${year} von ${jurisdiction}: durchsuchbar, mit Seitenbildern und als PDF herunterladbar.`,
+    robots: { index: false, follow: false },
   }
 }
 

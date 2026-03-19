@@ -49,6 +49,38 @@ test.describe('Search', () => {
     await expect(page.locator('h1')).toContainText('Suche')
   })
 
+  test('clicking result image opens expanded lightbox', async ({ page }) => {
+    await page.goto('/suche?q=NSU')
+    // Click the first search result thumbnail
+    const thumbnail = page.locator('article button[aria-label*="vergroessern"]').first()
+    await expect(thumbnail).toBeVisible()
+    await thumbnail.click()
+
+    // Lightbox should appear
+    const lightbox = page.locator('div[role="dialog"]')
+    await expect(lightbox).toBeVisible()
+
+    // Lightbox should contain the full image
+    const expandedImg = lightbox.locator('img')
+    await expect(expandedImg).toBeVisible()
+
+    // Close via the close button
+    await lightbox.locator('button[aria-label="Schliessen"]').click()
+    await expect(lightbox).not.toBeVisible()
+  })
+
+  test('lightbox closes on Escape key', async ({ page }) => {
+    await page.goto('/suche?q=NSU')
+    const thumbnail = page.locator('article button[aria-label*="vergroessern"]').first()
+    await thumbnail.click()
+
+    const lightbox = page.locator('div[role="dialog"]')
+    await expect(lightbox).toBeVisible()
+
+    await page.keyboard.press('Escape')
+    await expect(lightbox).not.toBeVisible()
+  })
+
   test('shows no results for nonsense query', async ({ page }) => {
     await page.goto('/suche?q=xyzzy12345nonexistent')
     // Should show 0 results or "keine Ergebnisse"
