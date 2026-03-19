@@ -1,17 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 export default function DarkModeToggle() {
-  const [dark, setDark] = useState(false);
-
-  useEffect(() => {
-    setDark(document.documentElement.classList.contains("dark"));
-  }, []);
-
   function toggle() {
     const isDark = document.documentElement.classList.toggle("dark");
-    setDark(isDark);
     localStorage.setItem("dark-mode", String(isDark));
   }
 

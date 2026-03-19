@@ -350,7 +350,7 @@ export default async function HomePage() {
           </p>
           <div className="grid sm:grid-cols-3 gap-4">
             <a
-              href="/data/pdfs.zip"
+              href="/downloads/vsberichte.zip"
               className="group block border border-gray-200 dark:border-gray-800 rounded-xl p-6 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
             >
               <div className="text-2xl mb-3" aria-hidden="true">
@@ -364,7 +364,7 @@ export default async function HomePage() {
               </div>
             </a>
             <a
-              href="/data/texte.zip"
+              href="/downloads/vsberichte-texts.zip"
               className="group block border border-gray-200 dark:border-gray-800 rounded-xl p-6 hover:border-blue-300 dark:hover:border-blue-700 transition-colors"
             >
               <div className="text-2xl mb-3" aria-hidden="true">
