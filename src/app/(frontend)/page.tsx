@@ -1,28 +1,17 @@
 import Link from "next/link";
 import SearchForm from "@/components/SearchForm";
+import ChartCarousel from "@/components/ChartCarousel";
 import HomepageChart from "@/components/HomepageChart";
 import {
   getDocumentCount,
   getJurisdictionCount,
-  getIndex,
 } from "@/lib/queries/documents";
 
-interface JurisdictionStat {
-  jurisdiction: string;
-  count: number;
-}
-
 export default async function HomePage() {
-  const [documentCount, jurisdictionCount, indexResult] = await Promise.all([
+  const [documentCount, jurisdictionCount] = await Promise.all([
     getDocumentCount(),
     getJurisdictionCount(),
-    getIndex(),
   ]);
-  const topJurisdictions: JurisdictionStat[] = indexResult.index
-    .map((j) => ({ jurisdiction: j.jurisdiction, count: j.years.length }))
-    .filter((j) => j.count > 0)
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 7);
 
   return (
     <>
@@ -90,33 +79,19 @@ export default async function HomePage() {
                     </div>
                   </div>
                 </div>
-                <hr className="border-gray-200 dark:border-gray-800 mb-6" />
-                <table className="w-full text-sm">
-                  <tbody>
-                    {topJurisdictions.map((j, i) => (
-                      <tr
-                        key={j.jurisdiction}
-                        className={
-                          i < topJurisdictions.length - 1
-                            ? "border-b border-gray-100 dark:border-gray-800/50"
-                            : ""
-                        }
-                      >
-                        <td className="py-2 text-gray-600 dark:text-gray-400">
-                          {j.jurisdiction}
-                        </td>
-                        <td className="py-2 text-right font-medium">
-                          {j.count}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <hr className="border-gray-200 dark:border-gray-800 mb-4" />
+                <HomepageChart
+                  title="Rechts- &amp; Linksextremismus"
+                  subtitle="Relative H&auml;ufigkeit in allen Berichten"
+                  queries={['rechtsextrem', 'linksextrem']}
+                  height={160}
+                  compact
+                />
                 <Link
-                  href="/berichte"
+                  href="/trends"
                   className="inline-flex items-center text-blue-700 dark:text-blue-400 text-sm font-medium mt-4 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                 >
-                  Alle Berichte &rarr;
+                  Trends entdecken &rarr;
                 </Link>
               </div>
             </div>
@@ -222,27 +197,7 @@ export default async function HomePage() {
       {/* Charts Section */}
       <section className="bg-gray-50 dark:bg-gray-900 py-24">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight mb-12">
-            Verfassungsschutz Trends
-          </h2>
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Chart 1 */}
-            <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
-              <HomepageChart
-                title="Erw&auml;hnungen von RAF und NSU"
-                subtitle="Bundesberichte, 1990&ndash;2023"
-                queries={['raf', 'nsu']}
-              />
-            </div>
-            {/* Chart 2 */}
-            <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6">
-              <HomepageChart
-                title="Erw&auml;hnungen von Parteien"
-                subtitle="Alle Berichte, 2000&ndash;2023"
-                queries={['npd', 'pkk', 'dkp']}
-              />
-            </div>
-          </div>
+          <ChartCarousel />
         </div>
       </section>
 

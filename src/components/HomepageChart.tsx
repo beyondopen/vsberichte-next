@@ -9,11 +9,13 @@ interface HomepageChartProps {
   title: string
   subtitle: string
   queries: string[]
+  height?: number
+  compact?: boolean
 }
 
 type StatsEntry = [string, Record<number, number>]
 
-export default function HomepageChart({ title, subtitle, queries }: HomepageChartProps) {
+export default function HomepageChart({ title, subtitle, queries, height = 224, compact = false }: HomepageChartProps) {
   const [data, setData] = useState<StatsEntry[] | null>(null)
   const isDark = useDarkMode()
   const chartRef = useRef<ReactEChartsCore>(null)
@@ -55,28 +57,30 @@ export default function HomepageChart({ title, subtitle, queries }: HomepageChar
     const years = Array.from(yearSet).sort((a, b) => a - b)
 
     return {
-      grid: { left: 8, right: 16, top: 8, bottom: 32, containLabel: true },
+      grid: compact
+        ? { left: 0, right: 8, top: 8, bottom: 24, containLabel: true }
+        : { left: 8, right: 16, top: 8, bottom: 32, containLabel: true },
       tooltip: {
         trigger: 'axis',
         valueFormatter: (v: number) => v.toFixed(6),
       },
       legend: {
         bottom: 0,
-        textStyle: { fontSize: 12 },
+        textStyle: { fontSize: compact ? 11 : 12 },
       },
       xAxis: {
         type: 'category',
         data: years.map(String),
         boundaryGap: false,
-        axisLabel: { fontSize: 11 },
+        axisLabel: { fontSize: compact ? 10 : 11 },
       },
       yAxis: {
         type: 'value',
         axisLabel: {
-          fontSize: 10,
+          fontSize: compact ? 9 : 10,
           fontFamily: 'ui-monospace, SFMono-Regular, monospace',
         },
-        splitNumber: 4,
+        splitNumber: compact ? 3 : 4,
       },
       series: data.map(([term, yearData]) => ({
         name: term,
@@ -101,13 +105,16 @@ export default function HomepageChart({ title, subtitle, queries }: HomepageChar
             echarts={echarts}
             option={getOption()}
             theme={themeName}
-            style={{ height: '224px', width: '100%' }}
+            style={{ height: `${height}px`, width: '100%' }}
             opts={{ renderer: 'canvas' }}
             notMerge
           />
         </div>
       ) : (
-        <div className="h-56 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center">
+        <div
+          className="border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-center"
+          style={{ height: `${height}px` }}
+        >
           <span className="text-sm text-gray-400 dark:text-gray-500">Lade Daten&hellip;</span>
         </div>
       )}
