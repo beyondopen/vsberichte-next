@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import Link from 'next/link'
 import HomepageChart from './HomepageChart'
 
 interface ChartSlide {
@@ -42,16 +43,14 @@ const slides: ChartSlide[] = [
   },
 ]
 
-// Show 2 slides at a time on desktop, 1 on mobile
-const SLIDES_PER_PAGE_DESKTOP = 2
-const SLIDES_PER_PAGE_MOBILE = 1
+const SLIDES_PER_PAGE = 2
 
 export default function ChartCarousel() {
   const [page, setPage] = useState(0)
 
   // Total pages depends on viewport — we use desktop count for logic,
   // CSS handles showing 1 or 2 cards
-  const totalPages = Math.ceil(slides.length / SLIDES_PER_PAGE_DESKTOP)
+  const totalPages = Math.ceil(slides.length / SLIDES_PER_PAGE)
 
   const prev = useCallback(() => {
     setPage((p) => (p > 0 ? p - 1 : totalPages - 1))
@@ -61,23 +60,22 @@ export default function ChartCarousel() {
     setPage((p) => (p < totalPages - 1 ? p + 1 : 0))
   }, [totalPages])
 
-  const startIdx = page * SLIDES_PER_PAGE_DESKTOP
-  const visibleSlides = slides.slice(startIdx, startIdx + SLIDES_PER_PAGE_DESKTOP)
+  const startIdx = page * SLIDES_PER_PAGE
+  const visibleSlides = slides.slice(startIdx, startIdx + SLIDES_PER_PAGE)
 
   return (
     <div>
       {/* Carousel Header */}
       <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight">
-            Verfassungsschutz Trends
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+        <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight">
+          Verfassungsschutz Trends
+        </h2>
+        <div className="flex items-center gap-4">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             {page + 1} / {totalPages}
           </p>
-        </div>
-        <div className="flex gap-2">
-          <button
+          <div className="flex gap-2">
+            <button
             type="button"
             onClick={prev}
             aria-label="Vorherige Charts"
@@ -97,8 +95,24 @@ export default function ChartCarousel() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
             </svg>
           </button>
+          </div>
         </div>
       </div>
+
+      {/* No-JS fallback */}
+      <noscript>
+        <div className="bg-white dark:bg-gray-950 border border-gray-200 dark:border-gray-800 rounded-xl p-6 text-center">
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Die interaktiven Charts ben&ouml;tigen JavaScript.
+          </p>
+          <Link
+            href="/trends"
+            className="text-blue-700 dark:text-blue-400 font-medium hover:underline"
+          >
+            Zur Trend-Analyse mit Datentabelle &rarr;
+          </Link>
+        </div>
+      </noscript>
 
       {/* Chart Cards */}
       <div className="grid md:grid-cols-2 gap-8">

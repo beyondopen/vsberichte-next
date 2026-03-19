@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import SearchForm from "@/components/SearchForm";
 import ChartCarousel from "@/components/ChartCarousel";
 import HomepageChart from "@/components/HomepageChart";
@@ -226,7 +227,7 @@ export default async function HomePage() {
                   Verfassungsschutzes.&ldquo;
                 </p>
                 <footer className="flex items-center gap-3">
-                  <img src="/avatars/kn.jpg" alt="Katharina Nocun" className="w-10 h-10 rounded-full" />
+                  <Image src="/avatars/kn.jpg" alt="Katharina Nocun" width={40} height={40} className="w-10 h-10 rounded-full" />
                   <cite className="not-italic">
                     <span className="font-bold text-gray-900 dark:text-gray-100">
                       Katharina Nocun
@@ -258,7 +259,7 @@ export default async function HomePage() {
                   zug&auml;nglich.&ldquo;
                 </p>
                 <footer className="flex items-center gap-3">
-                  <img src="/avatars/ln.jpg" alt="Linus Neumann" className="w-10 h-10 rounded-full" />
+                  <Image src="/avatars/ln.jpg" alt="Linus Neumann" width={40} height={40} className="w-10 h-10 rounded-full" />
                   <cite className="not-italic">
                     <span className="font-bold text-gray-900 dark:text-gray-100">
                       Linus Neumann
@@ -290,7 +291,7 @@ export default async function HomePage() {
                   kontrollieren.&ldquo;
                 </p>
                 <footer className="flex items-center gap-3">
-                  <img src="/avatars/as.jpg" alt="Arne Semsrott" className="w-10 h-10 rounded-full" />
+                  <Image src="/avatars/as.jpg" alt="Arne Semsrott" width={40} height={40} className="w-10 h-10 rounded-full" />
                   <cite className="not-italic">
                     <span className="font-bold text-gray-900 dark:text-gray-100">
                       Arne Semsrott
@@ -318,7 +319,7 @@ export default async function HomePage() {
                   wird durch diese Webseite nun einfacher.&ldquo;
                 </p>
                 <footer className="flex items-center gap-3">
-                  <img src="/avatars/mw.jpg" alt="Michèle Winkler" className="w-10 h-10 rounded-full" />
+                  <Image src="/avatars/mw.jpg" alt="Michèle Winkler" width={40} height={40} className="w-10 h-10 rounded-full" />
                   <cite className="not-italic">
                     <span className="font-bold text-gray-900 dark:text-gray-100">
                       Mich&egrave;le Winkler
@@ -406,22 +407,22 @@ export default async function HomePage() {
           </p>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-10 items-center justify-items-center">
             <a href="https://www.apabiz.de" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-              <img src="/logos/apabiz.svg" alt="apabiz e.V." className="h-12 w-auto dark:invert" />
+              <Image src="/logos/apabiz.svg" alt="apabiz e.V." width={120} height={48} className="h-12 w-auto dark:invert" unoptimized />
             </a>
             <a href="http://www.humanistische-union.de/" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-              <img src="/logos/hu.jpg" alt="Humanistische Union" className="h-12 w-auto" />
+              <Image src="/logos/hu.jpg" alt="Humanistische Union" width={120} height={48} className="h-12 w-auto" />
             </a>
             <a href="https://blackbox-vs.de" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-              <img src="/logos/blackbox.jpg" alt="Blackbox VS" className="h-12 w-auto" />
+              <Image src="/logos/blackbox.jpg" alt="Blackbox VS" width={120} height={48} className="h-12 w-auto" />
             </a>
             <a href="https://fragdenstaat.de" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-              <img src="/logos/frag_den_staat_logo.svg" alt="FragDenStaat" className="h-10 w-auto dark:invert" />
+              <Image src="/logos/frag_den_staat_logo.svg" alt="FragDenStaat" width={120} height={40} className="h-10 w-auto dark:invert" unoptimized />
             </a>
             <a href="https://codefor.de" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-              <img src="/logos/CFG_logo.svg" alt="Code for Germany" className="h-10 w-auto dark:invert" />
+              <Image src="/logos/CFG_logo.svg" alt="Code for Germany" width={120} height={40} className="h-10 w-auto dark:invert" unoptimized />
             </a>
             <a href="https://okfn.de" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-              <img src="/logos/okf.svg" alt="Open Knowledge Foundation" className="h-10 w-auto dark:invert" />
+              <Image src="/logos/okf.svg" alt="Open Knowledge Foundation" width={120} height={40} className="h-10 w-auto dark:invert" unoptimized />
             </a>
           </div>
         </div>
