@@ -60,6 +60,14 @@ export default function Footer() {
             <ul className="space-y-2 text-sm">
               <li>
                 <Link
+                  href="/seite/ueber-uns"
+                  className="hover:text-white transition-colors"
+                >
+                  &Uuml;ber uns
+                </Link>
+              </li>
+              <li>
+                <Link
                   href="/news"
                   className="hover:text-white transition-colors"
                 >
@@ -68,19 +76,11 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/impressum"
-                  className="hover:text-white transition-colors"
-                >
-                  Impressum
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="mailto:vsberichte@proton.me"
+                  href="/seite/kontakt"
                   className="hover:text-white transition-colors"
                 >
                   Kontakt
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -129,19 +129,17 @@ export default function Footer() {
           </p>
           <div className="flex gap-6">
             <Link
-              href="/impressum"
+              href="/seite/impressum"
               className="hover:text-white transition-colors"
             >
               Impressum
             </Link>
-            <a
-              href="https://okfn.de/datenschutz/"
+            <Link
+              href="/seite/datenschutz"
               className="hover:text-white transition-colors"
-              target="_blank"
-              rel="noopener noreferrer"
             >
               Datenschutz
-            </a>
+            </Link>
           </div>
         </div>
       </div>

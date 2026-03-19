@@ -1,4 +1,6 @@
 import type { MetadataRoute } from 'next'
+import { getPayload } from 'payload'
+import config from '@payload-config'
 import { getIndex } from '@/lib/queries/documents'
 import { jurisdictionToSlug } from '@/lib/jurisdictions'
 
@@ -12,10 +14,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/trends`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/regional`, changeFrequency: 'monthly', priority: 0.7 },
     { url: `${baseUrl}/news`, changeFrequency: 'weekly', priority: 0.6 },
-    { url: `${baseUrl}/impressum`, changeFrequency: 'yearly', priority: 0.3 },
   ]
 
-  // Add all document pages
+  // CMS pages
+  const payload = await getPayload({ config })
+  const { docs: pages } = await payload.find({
+    collection: 'pages',
+    limit: 100,
+  })
+  const cmsPageRoutes: MetadataRoute.Sitemap = pages.map((page) => ({
+    url: `${baseUrl}/seite/${page.slug}`,
+    changeFrequency: 'yearly' as const,
+    priority: 0.4,
+  }))
+
+  // Document pages
   const { index } = await getIndex()
   const documentRoutes: MetadataRoute.Sitemap = []
   for (const entry of index) {
@@ -29,5 +42,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...documentRoutes]
+  return [...staticRoutes, ...cmsPageRoutes, ...documentRoutes]
 }
