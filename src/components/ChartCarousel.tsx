@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import HomepageChart from './HomepageChart'
 
@@ -60,11 +60,37 @@ export default function ChartCarousel() {
     setPage((p) => (p < totalPages - 1 ? p + 1 : 0))
   }, [totalPages])
 
+  // Touch swipe support
+  const touchStartX = useRef(0)
+  const touchEndX = useRef(0)
+  const minSwipeDistance = 50
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    touchEndX.current = e.touches[0].clientX
+  }
+
+  function handleTouchEnd() {
+    const distance = touchStartX.current - touchEndX.current
+    if (Math.abs(distance) >= minSwipeDistance) {
+      if (distance > 0) next()
+      else prev()
+    }
+  }
+
   const startIdx = page * SLIDES_PER_PAGE
   const visibleSlides = slides.slice(startIdx, startIdx + SLIDES_PER_PAGE)
 
   return (
-    <div>
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       {/* Carousel Header */}
       <div className="flex items-center justify-between mb-8">
         <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight">
