@@ -8,6 +8,10 @@ import {
   getJurisdictionCount,
 } from "@/lib/queries/documents";
 
+// Rendered at request time: the DB is not available during `next build`
+// (Dokku builds the image without a DATABASE_URL).
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [documentCount, jurisdictionCount] = await Promise.all([
     getDocumentCount(),

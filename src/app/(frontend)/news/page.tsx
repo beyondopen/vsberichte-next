@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { getPayload } from 'payload'
 import config from '@payload-config'
 
-export const revalidate = 3600
+// Rendered at request time: the DB is not available during `next build`
+// (Dokku builds the image without a DATABASE_URL).
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'News -- Verfassungsschutzberichte.de',

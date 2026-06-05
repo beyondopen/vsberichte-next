@@ -4,6 +4,10 @@ import config from '@payload-config'
 import { getIndex } from '@/lib/queries/documents'
 import { jurisdictionToSlug } from '@/lib/jurisdictions'
 
+// Rendered at request time: the DB is not available during `next build`
+// (Dokku builds the image without a DATABASE_URL).
+export const dynamic = 'force-dynamic'
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://verfassungsschutzberichte.de'
 
