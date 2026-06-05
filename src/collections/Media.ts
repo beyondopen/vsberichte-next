@@ -1,9 +1,11 @@
+import path from 'path'
+
 import type { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
   upload: {
-    staticDir: 'media',
+    staticDir: process.env.MEDIA_DIR || path.resolve(process.cwd(), 'media'),
     imageSizes: [
       { name: 'thumbnail', width: 400, height: 300, position: 'centre' },
       { name: 'card', width: 768, height: undefined, position: 'centre' },
