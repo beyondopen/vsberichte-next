@@ -14,16 +14,10 @@ export async function GET(
   const ext = path.extname(safeName).toLowerCase()
   const contentType = ext === '.png' ? 'image/png' : ext === '.avif' ? 'image/avif' : 'image/jpeg'
 
-  if (process.env.NODE_ENV === 'production') {
-    return new NextResponse(null, {
-      headers: {
-        'X-Accel-Redirect': `/internal-images/${safeName}`,
-        'Content-Type': contentType,
-        'X-Robots-Tag': 'noindex, nofollow',
-      },
-    })
-  }
-
+  // Unlike PDFs/zips, images are NOT served via nginx X-Accel-Redirect: the
+  // Next.js image optimizer invokes this route in-process (bypassing nginx),
+  // so it must return real bytes. Browsers fetch the optimized /_next/image
+  // variants, which Next caches on disk — direct hits here stay rare.
   try {
     const fileStat = await stat(filePath)
     const file = await readFile(filePath)
