@@ -1,6 +1,7 @@
+import type { ServerFunctionClient } from 'payload'
+
 import config from '@payload-config'
-import { RootLayout } from '@payloadcms/next/layouts'
-import { handleServerFunctions } from '@payloadcms/next/layouts'
+import { handleServerFunctions, RootLayout } from '@payloadcms/next/layouts'
 import { importMap } from './admin/[[...segments]]/importMap'
 import React from 'react'
 
@@ -8,12 +9,22 @@ import '@payloadcms/next/css'
 
 type LayoutArgs = { children: React.ReactNode }
 
-export default async function Layout({ children }: LayoutArgs) {
-  return RootLayout({
-    children,
+// Must be an inline server action ('use server') so React can serialize the
+// reference when passing it to the client-side admin provider. Passing
+// handleServerFunctions directly crashes the admin in production builds.
+const serverFunction: ServerFunctionClient = async function (args) {
+  'use server'
+  return handleServerFunctions({
+    ...args,
     config,
     importMap,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    serverFunction: handleServerFunctions as any,
   })
+}
+
+export default async function Layout({ children }: LayoutArgs) {
+  return (
+    <RootLayout config={config} importMap={importMap} serverFunction={serverFunction}>
+      {children}
+    </RootLayout>
+  )
 }
