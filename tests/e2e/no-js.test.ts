@@ -50,6 +50,15 @@ test.describe('Without JavaScript', () => {
     await expect(page.locator('article').first()).toBeVisible()
   })
 
+  test('berichte: jurisdiction grid filter via submit', async () => {
+    await page.goto('/berichte')
+    await page.locator('select[name="jurisdiction"]').selectOption('Bayern')
+    await page.getByRole('button', { name: 'Filtern' }).click()
+    await expect(page).toHaveURL(/jurisdiction=Bayern/)
+    const rows = page.locator('h2', { hasText: '(seit' })
+    await expect(rows).toHaveCount(1)
+  })
+
   test('berichte: year range via number inputs', async () => {
     await page.goto('/berichte?type=alle')
     await page.locator('input[name="min_year"]').fill('2020')

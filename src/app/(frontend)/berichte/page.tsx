@@ -54,7 +54,9 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
   const minYear = minYearStr ? parseInt(minYearStr, 10) : undefined
   const maxYear = maxYearStr ? parseInt(maxYearStr, 10) : undefined
 
-  const showGrid = type === 'jahresbericht'
+  // The grid only makes sense for German Jahresberichte; a language
+  // filter switches to the (fully filterable) list view.
+  const showGrid = type === 'jahresbericht' && !languageFilter
 
   // For the grid view, use getIndex filtered by type
   // For list view, use getFilteredDocuments
@@ -72,8 +74,6 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
       })
     : []
 
-  const displayTotal = showGrid ? total : filteredDocuments.length
-
   const currentYear = new Date().getFullYear()
   const yearBounds = await getYearBounds()
 
@@ -81,6 +81,35 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
   const availableYears = new Map<string, Set<number>>()
   for (const entry of index) {
     availableYears.set(entry.jurisdiction, new Set(entry.years))
+  }
+
+  // Grid rows after applying the jurisdiction/year filters; rows whose
+  // year window is empty disappear entirely.
+  const gridYearEnd = Math.min(currentYear, maxYear ?? currentYear)
+  const gridJurisdictions = showGrid
+    ? jurisdictions.filter((jur) => {
+        if (jurisdictionFilter && jur !== jurisdictionFilter) return false
+        const jurStartYear = reportInfo.startYear[jur]
+        if (!jurStartYear) return false
+        return gridYearEnd >= Math.max(jurStartYear, minYear ?? jurStartYear)
+      })
+    : []
+
+  // Header count: filtered availability in grid mode, list length otherwise
+  let displayTotal = filteredDocuments.length
+  if (showGrid) {
+    if (jurisdictionFilter || minYear || maxYear) {
+      displayTotal = 0
+      for (const jur of gridJurisdictions) {
+        for (const year of availableYears.get(jur) ?? []) {
+          if (minYear && year < minYear) continue
+          if (maxYear && year > maxYear) continue
+          displayTotal++
+        }
+      }
+    } else {
+      displayTotal = total
+    }
   }
 
   return (
@@ -169,26 +198,35 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
           {/* Reports Grid */}
           <section className="pb-24">
             <div className="max-w-6xl mx-auto px-6 space-y-12">
-              {jurisdictions.map((jur) => {
+              {gridJurisdictions.length === 0 && (
+                <p className="text-gray-500 dark:text-gray-400 text-lg py-12 text-center">
+                  Keine Berichte f&uuml;r die gew&auml;hlten Filter gefunden.
+                </p>
+              )}
+              {gridJurisdictions.map((jur) => {
                 const jurStartYear = reportInfo.startYear[jur]
                 const noReportYears = new Set(reportInfo.noReports[jur] || [])
                 const available = availableYears.get(jur) || new Set<number>()
                 const slug = jurisdictionToSlug(jur)
-
-                if (!jurStartYear) return null
+                const rowStart = Math.max(jurStartYear, minYear ?? jurStartYear)
 
                 return (
                   <div key={jur}>
                     <h2 className="font-headline font-bold text-2xl tracking-tight mb-3">
-                      {jur}{' '}
+                      <Link
+                        href={`/${slug}`}
+                        className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                      >
+                        {jur}
+                      </Link>{' '}
                       <span className="text-gray-400 dark:text-gray-500 font-normal text-lg">
                         (seit {jurStartYear})
                       </span>
                     </h2>
                     <div className="flex flex-wrap gap-1.5">
                       {Array.from(
-                        { length: currentYear - jurStartYear + 1 },
-                        (_, i) => currentYear - i
+                        { length: gridYearEnd - rowStart + 1 },
+                        (_, i) => gridYearEnd - i
                       ).map((year) => {
                         if (noReportYears.has(year)) {
                           // Not published -- gray
