@@ -4,6 +4,7 @@
 
 @theme {
   --font-serif: var(--font-source-serif-4), Georgia, serif;
+  --font-headline: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
 }
 
 details summary::-webkit-details-marker { display: none; }

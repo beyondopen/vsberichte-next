@@ -1,11 +1,19 @@
-import type { Metadata } from "next";
-import { Source_Serif_4 } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Source_Serif_4, Archivo } from "next/font/google";
 import "./globals.css";
 
 const sourceSerif4 = Source_Serif_4({
   variable: "--font-source-serif-4",
   subsets: ["latin"],
   weight: ["400", "600", "700"],
+  display: "swap",
+});
+
+// Logo- und Headline-Schrift (Variable Font: alle Gewichte fuer
+// font-bold-Headlines + font-extrabold-Wortmarke).
+const archivo = Archivo({
+  variable: "--font-archivo",
+  subsets: ["latin"],
   display: "swap",
 });
 
@@ -20,8 +28,24 @@ export const metadata: Metadata = {
     title: "Verfassungsschutzberichte.de",
     description:
       "Alle Verfassungsschutzberichte des Bundes und der Laender: gesammelt, durchsuchbar und analysiert.",
-    images: [{ url: "/thumbnail.jpg" }],
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
   },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/site.webmanifest",
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#030712" },
+  ],
 };
 
 export default function RootLayout({
@@ -30,7 +54,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="de" className={sourceSerif4.variable} suppressHydrationWarning>
+    <html
+      lang="de"
+      className={`${sourceSerif4.variable} ${archivo.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <script
           dangerouslySetInnerHTML={{

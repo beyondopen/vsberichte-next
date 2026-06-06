@@ -1,6 +1,7 @@
 import Link from "next/link";
 import DarkModeToggle from "@/components/DarkModeToggle";
 import MobileMenu from "@/components/MobileMenu";
+import { VsbMark } from "@/components/VsbMark";
 
 const links = [
   { href: "/berichte", label: "Berichte" },
@@ -16,8 +17,10 @@ export default function Navbar() {
       <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-16">
         <Link
           href="/"
-          className="font-serif font-bold text-xl tracking-tight"
+          aria-label="Verfassungsschutzberichte.de — Startseite"
+          className="flex items-center gap-2 sm:gap-2.5 text-sm sm:text-xl font-extrabold tracking-tight font-headline [--vsb-surface:#ffffff] dark:[--vsb-surface:#030712]"
         >
+          <VsbMark className="h-6 sm:h-7 w-auto shrink-0" />
           Verfassungsschutzberichte.de
         </Link>
         <div className="hidden md:flex items-center gap-8 text-sm">

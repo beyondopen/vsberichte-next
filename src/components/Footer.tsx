@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { VsbMark } from "@/components/VsbMark";
 
 export default function Footer() {
   return (
@@ -6,8 +7,9 @@ export default function Footer() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div>
-            <h3 className="font-serif font-bold text-white text-lg mb-4">
-              Verfassungsschutz&shy;berichte.de
+            <h3 className="flex items-center gap-2 text-white text-lg font-extrabold tracking-tight font-headline [--vsb-surface:#111827] mb-4">
+              <VsbMark className="h-6 w-auto shrink-0" />
+              <span>Verfassungsschutz&shy;berichte.de</span>
             </h3>
             <p className="text-sm leading-relaxed">
               Ein zivilgesellschaftliches Projekt f&uuml;r Transparenz und
