@@ -16,7 +16,10 @@ ENV NEXT_TELEMETRY_DISABLED=1
 # (pass --build-arg ANALYTICS_ENABLED=true to enable Matomo)
 ARG ANALYTICS_ENABLED
 ENV ANALYTICS_ENABLED=$ANALYTICS_ENABLED
-RUN npm run build
+# Compile-only build (official Payload recommendation): skips static
+# prerendering so no database is needed at image build time; all routes
+# render at request time. https://payloadcms.com/docs/production/building-without-a-db-connection
+RUN npm run build -- --experimental-build-mode compile
 
 # Production image
 FROM base AS runner

@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache'
+
 import pool from '@/lib/db'
 import { jurisdictions } from '@/lib/jurisdictions'
 
@@ -29,8 +31,11 @@ export interface JurisdictionIndex {
  * Get all jurisdictions with their available years (descending).
  * Returns the index data and total document count.
  * Optionally filters by document type.
+ * Cached: used by the homepage, /berichte, /api and the sitemap; call sites
+ * only pass fixed documentType values, so cache keys stay bounded.
  */
-export async function getIndex(documentType?: string): Promise<{ index: JurisdictionIndex[]; total: number }> {
+export const getIndex = unstable_cache(
+  async (documentType?: string): Promise<{ index: JurisdictionIndex[]; total: number }> => {
   let result
   if (documentType) {
     result = await pool.query<{ jurisdiction: string; year: number }>(
@@ -57,7 +62,10 @@ export async function getIndex(documentType?: string): Promise<{ index: Jurisdic
 
   const total = result.rowCount ?? 0
   return { index, total }
-}
+  },
+  ['document-index'],
+  { revalidate: 3600 }
+)
 
 export interface DocumentFilter {
   documentType?: string
@@ -130,22 +138,31 @@ export async function getDocumentPages(documentId: number): Promise<DocumentPage
 }
 
 /**
- * Get total number of documents.
+ * Get total number of documents. Cached: rendered on every homepage request.
  */
-export async function getDocumentCount(): Promise<number> {
-  const result = await pool.query<{ count: string }>('SELECT COUNT(*) as count FROM document')
-  return parseInt(result.rows[0].count, 10)
-}
+export const getDocumentCount = unstable_cache(
+  async (): Promise<number> => {
+    const result = await pool.query<{ count: string }>('SELECT COUNT(*) as count FROM document')
+    return parseInt(result.rows[0].count, 10)
+  },
+  ['document-count'],
+  { revalidate: 3600 }
+)
 
 /**
  * Get count of distinct jurisdictions that have documents.
+ * Cached: rendered on every homepage request.
  */
-export async function getJurisdictionCount(): Promise<number> {
-  const result = await pool.query<{ count: string }>(
-    'SELECT COUNT(DISTINCT jurisdiction) as count FROM document'
-  )
-  return parseInt(result.rows[0].count, 10)
-}
+export const getJurisdictionCount = unstable_cache(
+  async (): Promise<number> => {
+    const result = await pool.query<{ count: string }>(
+      'SELECT COUNT(DISTINCT jurisdiction) as count FROM document'
+    )
+    return parseInt(result.rows[0].count, 10)
+  },
+  ['jurisdiction-count'],
+  { revalidate: 3600 }
+)
 
 /**
  * Get total word count for a document (sum of all token counts).

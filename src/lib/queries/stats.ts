@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache'
+
 import pool from '@/lib/db'
 
 /** Minimum year for trend analysis (need sufficient data coverage) */
@@ -5,23 +7,29 @@ const TRENDS_MIN_YEAR = 1993
 
 /**
  * Get total token counts per year (for normalizing relative frequencies).
+ * Cached: aggregates over the full token_count table (millions of rows) and
+ * runs inside every getTermStats call; the data only changes on imports.
  */
-export async function getYearTotals(): Promise<Record<number, number>> {
-  const result = await pool.query<{ year: number; total: string }>(
-    `SELECT d.year, SUM(tc.count) as total
-     FROM token_count tc
-     JOIN document d ON tc.document_id = d.id
-     WHERE d.year >= $1
-     GROUP BY d.year`,
-    [TRENDS_MIN_YEAR]
-  )
+export const getYearTotals = unstable_cache(
+  async (): Promise<Record<number, number>> => {
+    const result = await pool.query<{ year: number; total: string }>(
+      `SELECT d.year, SUM(tc.count) as total
+       FROM token_count tc
+       JOIN document d ON tc.document_id = d.id
+       WHERE d.year >= $1
+       GROUP BY d.year`,
+      [TRENDS_MIN_YEAR]
+    )
 
-  const totals: Record<number, number> = {}
-  for (const row of result.rows) {
-    totals[row.year] = parseInt(row.total, 10)
-  }
-  return totals
-}
+    const totals: Record<number, number> = {}
+    for (const row of result.rows) {
+      totals[row.year] = parseInt(row.total, 10)
+    }
+    return totals
+  },
+  ['year-totals'],
+  { revalidate: 3600 }
+)
 
 export interface TermStatsParams {
   jurisdiction?: string | null
