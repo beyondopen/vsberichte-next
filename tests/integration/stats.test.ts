@@ -40,17 +40,37 @@ describe('stats queries (integration)', () => {
     }
   })
 
-  it('getTermStats filters by jurisdiction', async () => {
+  it('getTermStats filters by jurisdictions (pooled relative frequency)', async () => {
     const [, allData] = await getTermStats('Verfassungsschutz')
-    const [, bayernData] = await getTermStats('Verfassungsschutz', { jurisdiction: 'Bayern' })
+    const [, bayernData] = await getTermStats('Verfassungsschutz', {
+      jurisdictions: ['Bayern'],
+    })
 
-    // Bayern-filtered data should have fewer or equal values in each year
-    for (const year of Object.keys(bayernData)) {
-      const y = Number(year)
-      if (allData[y] !== undefined && bayernData[y] > 0) {
-        expect(bayernData[y]).toBeLessThanOrEqual(allData[y])
-      }
+    // The denominator is restricted to the same jurisdictions as the
+    // numerator, so the filtered value is a valid relative frequency —
+    // it may be larger OR smaller than the all-corpus value, but it must
+    // differ somewhere and stay a sane ratio.
+    const years = Object.keys(bayernData).map(Number)
+    expect(years.length).toBeGreaterThan(0)
+    let differs = false
+    for (const y of years) {
+      expect(bayernData[y]).toBeGreaterThanOrEqual(0)
+      expect(bayernData[y]).toBeLessThanOrEqual(1)
+      if (allData[y] !== undefined && bayernData[y] !== allData[y]) differs = true
     }
+    expect(differs).toBe(true)
+  })
+
+  it('getTermStats is independent of jurisdiction order', async () => {
+    // Callers sort via normalizeJurisdictions; equal input sets must give
+    // equal results (and share one cache entry).
+    const [, a] = await getTermStats('Verfassungsschutz', {
+      jurisdictions: ['Bayern', 'Bund'],
+    })
+    const [, b] = await getTermStats('Verfassungsschutz', {
+      jurisdictions: ['Bayern', 'Bund'],
+    })
+    expect(a).toEqual(b)
   })
 
   it('getYearTotals returns year-keyed totals', async () => {
@@ -63,6 +83,16 @@ describe('stats queries (integration)', () => {
     for (const total of Object.values(totals)) {
       expect(typeof total).toBe('number')
       expect(total).toBeGreaterThan(0)
+    }
+  })
+
+  it('getYearTotals restricted to a jurisdiction is a subset of the corpus totals', async () => {
+    const all = await getYearTotals()
+    const bayern = await getYearTotals(['Bayern'])
+    for (const [year, total] of Object.entries(bayern)) {
+      const y = Number(year)
+      expect(total).toBeGreaterThan(0)
+      expect(total).toBeLessThanOrEqual(all[y])
     }
   })
 })

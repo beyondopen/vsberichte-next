@@ -9,7 +9,8 @@ test.describe('Berichte', () => {
   test('has filter bar with dropdowns and year range', async ({ page }) => {
     await page.goto('/berichte')
     await expect(page.locator('select[name="type"]')).toBeVisible()
-    await expect(page.locator('select[name="jurisdiction"]')).toBeVisible()
+    // Jurisdiction is a combobox after hydration (multi-select)
+    await expect(page.locator('#filter-jurisdiction')).toBeVisible()
     await expect(page.locator('input[name="min_year"]')).toBeVisible()
     await expect(page.locator('input[name="max_year"]')).toBeVisible()
   })
@@ -26,6 +27,13 @@ test.describe('Berichte', () => {
     const rows = page.locator('h2', { hasText: '(seit' })
     await expect(rows).toHaveCount(1)
     await expect(rows.first()).toContainText('Bayern')
+  })
+
+  test('grid filters by multiple jurisdictions', async ({ page }) => {
+    await page.goto('/berichte?jurisdiction=Bayern&jurisdiction=Bund')
+    const rows = page.locator('h2', { hasText: '(seit' })
+    await expect(rows).toHaveCount(2)
+    await expect(page.locator('#filter-jurisdiction')).toContainText('Bund, Bayern')
   })
 
   test('grid year range restricts year cells instantly', async ({ page }) => {

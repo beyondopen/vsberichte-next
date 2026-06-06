@@ -2,10 +2,15 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getIndex, getFilteredDocuments, getYearBounds } from '@/lib/queries/documents'
 import { reportInfo, documentTypeLabels } from '@/lib/report-info'
-import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
+import {
+  jurisdictions,
+  jurisdictionToSlug,
+  normalizeJurisdictions,
+} from '@/lib/jurisdictions'
 import FilterPanel from '@/components/filters/FilterPanel'
 import { FilterSubmit } from '@/components/filters/FilterBar'
 import SelectFilter from '@/components/filters/SelectFilter'
+import MultiSelectFilter from '@/components/filters/MultiSelectFilter'
 import YearRangeFilter from '@/components/filters/YearRangeFilter'
 import { documentTypeOptions, languageOptions } from '@/components/filters/filter-constants'
 
@@ -38,7 +43,7 @@ interface BerichtePageProps {
   searchParams: Promise<{
     type?: string
     language?: string
-    jurisdiction?: string
+    jurisdiction?: string | string[]
     min_year?: string
     max_year?: string
   }>
@@ -48,7 +53,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
   const params = await searchParams
   const type = params.type || 'jahresbericht'
   const languageFilter = params.language || ''
-  const jurisdictionFilter = params.jurisdiction || ''
+  const selectedJurisdictions = normalizeJurisdictions(params.jurisdiction)
   const minYearStr = params.min_year || ''
   const maxYearStr = params.max_year || ''
   const minYear = minYearStr ? parseInt(minYearStr, 10) : undefined
@@ -68,7 +73,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
     ? await getFilteredDocuments({
         documentType: type,
         language: languageFilter || undefined,
-        jurisdiction: jurisdictionFilter || undefined,
+        jurisdictions: selectedJurisdictions,
         minYear,
         maxYear,
       })
@@ -88,7 +93,8 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
   const gridYearEnd = Math.min(currentYear, maxYear ?? currentYear)
   const gridJurisdictions = showGrid
     ? jurisdictions.filter((jur) => {
-        if (jurisdictionFilter && jur !== jurisdictionFilter) return false
+        if (selectedJurisdictions.length > 0 && !selectedJurisdictions.includes(jur))
+          return false
         const jurStartYear = reportInfo.startYear[jur]
         if (!jurStartYear) return false
         return gridYearEnd >= Math.max(jurStartYear, minYear ?? jurStartYear)
@@ -98,7 +104,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
   // Header count: filtered availability in grid mode, list length otherwise
   let displayTotal = filteredDocuments.length
   if (showGrid) {
-    if (jurisdictionFilter || minYear || maxYear) {
+    if (selectedJurisdictions.length > 0 || minYear || maxYear) {
       displayTotal = 0
       for (const jur of gridJurisdictions) {
         for (const year of availableYears.get(jur) ?? []) {
@@ -151,13 +157,14 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
                 options={languageOptions}
                 defaultValue={languageFilter}
               />
-              <SelectFilter
+              <MultiSelectFilter
                 id="filter-jurisdiction"
                 name="jurisdiction"
                 label="Behörde"
                 allLabel="Alle Behörden"
+                countNoun="Behörden"
                 options={jurisdictions}
-                defaultValue={jurisdictionFilter}
+                selected={selectedJurisdictions}
               />
               <YearRangeFilter
                 label="Zeitraum"

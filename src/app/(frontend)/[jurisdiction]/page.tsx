@@ -41,7 +41,7 @@ export default async function JurisdictionPage({
   const jurStartYear = reportInfo.startYear[jurisdiction]
   if (!jurStartYear) notFound()
 
-  const documents = await getFilteredDocuments({ jurisdiction })
+  const documents = await getFilteredDocuments({ jurisdictions: [jurisdiction] })
 
   const currentYear = new Date().getFullYear()
   const noReportYears = new Set(reportInfo.noReports[jurisdiction] || [])

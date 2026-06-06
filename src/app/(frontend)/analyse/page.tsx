@@ -3,11 +3,14 @@ import Link from 'next/link'
 import { getTermStats } from '@/lib/queries/stats'
 import { getMentions } from '@/lib/queries/mentions'
 import { getYearBounds } from '@/lib/queries/documents'
+import { jurisdictions, normalizeJurisdictions } from '@/lib/jurisdictions'
 import TrendChart from '@/components/TrendChart'
 import Heatmap from '@/components/Heatmap'
 import FilterPanel from '@/components/filters/FilterPanel'
 import { FilterSubmit } from '@/components/filters/FilterBar'
 import TermTags from '@/components/filters/TermTags'
+import TermAutocompleteInput from '@/components/filters/TermAutocompleteInput'
+import MultiSelectFilter from '@/components/filters/MultiSelectFilter'
 import YearRangeFilter from '@/components/filters/YearRangeFilter'
 
 export const dynamic = 'force-dynamic'
@@ -28,15 +31,17 @@ interface AnalysePageProps {
     q?: string | string[]
     term?: string
     remove?: string
+    jurisdiction?: string | string[]
     min_year?: string
     max_year?: string
     fokus?: string
   }>
 }
 
-/** Build an /analyse URL carrying terms, year range and heatmap fokus. */
+/** Build an /analyse URL carrying terms, jurisdictions, year range and heatmap fokus. */
 function analyseUrl(options: {
   terms: string[]
+  jurisdictions?: string[]
   minYear?: string
   maxYear?: string
   fokus?: string
@@ -44,6 +49,9 @@ function analyseUrl(options: {
   const params = new URLSearchParams()
   for (const term of options.terms) {
     params.append('q', term)
+  }
+  for (const j of options.jurisdictions ?? []) {
+    params.append('jurisdiction', j)
   }
   if (options.minYear) params.set('min_year', options.minYear)
   if (options.maxYear) params.set('max_year', options.maxYear)
@@ -82,6 +90,8 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
   const fokus =
     params.fokus && terms.includes(params.fokus) ? params.fokus : terms[0]
 
+  const selectedJurisdictions = normalizeJurisdictions(params.jurisdiction)
+
   const minYearStr = params.min_year || ''
   const maxYearStr = params.max_year || ''
   const minYearParsed = minYearStr ? parseInt(minYearStr, 10) : null
@@ -97,7 +107,16 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
 
   if (terms.length > 0) {
     const [stats, mentions] = await Promise.all([
-      Promise.all(terms.map((term) => getTermStats(term, { minYear, maxYear }))),
+      Promise.all(
+        terms.map((term) =>
+          getTermStats(term, {
+            jurisdictions: selectedJurisdictions,
+            minYear,
+            maxYear,
+          })
+        )
+      ),
+      // The heatmap stays unfiltered by jurisdiction — it IS the comparison
       fokus ? getMentions(fokus, { minYear, maxYear }) : Promise.resolve(null),
     ])
     statsData = stats
@@ -175,16 +194,21 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
                 >
                   Begriff
                 </label>
-                <input
+                <TermAutocompleteInput
                   id="term-input"
-                  type="text"
-                  name="term"
-                  data-filter-manual=""
                   placeholder="Begriff eingeben..."
-                  className="w-full px-4 py-2.5 border border-input rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                 />
               </div>
               <FilterSubmit hideWhenEnhanced={false}>Hinzufügen</FilterSubmit>
+              <MultiSelectFilter
+                id="filter-jurisdiction"
+                name="jurisdiction"
+                label="Behörde"
+                allLabel="Alle Behörden"
+                countNoun="Behörden"
+                options={jurisdictions}
+                selected={selectedJurisdictions}
+              />
               <YearRangeFilter
                 minLimit={yearBounds.minYear}
                 maxLimit={yearBounds.maxYear}
@@ -198,6 +222,7 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
             terms={terms}
             suggestions={suggestions}
             extraParams={{ min_year: minYearStr, max_year: maxYearStr }}
+            multiParams={{ jurisdiction: selectedJurisdictions }}
           />
         </div>
       </section>
@@ -211,7 +236,9 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
                 Relative Häufigkeit: {terms.join(', ')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                Alle Berichte
+                {selectedJurisdictions.length > 0
+                  ? selectedJurisdictions.join(', ')
+                  : 'Alle Berichte'}
                 {sortedYears.length > 0 &&
                   `, ${sortedYears[0]}–${sortedYears[sortedYears.length - 1]}`}
               </p>
@@ -291,7 +318,13 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
                   {terms.map((term) => (
                     <Link
                       key={term}
-                      href={analyseUrl({ terms, minYear: minYearStr, maxYear: maxYearStr, fokus: term })}
+                      href={analyseUrl({
+                        terms,
+                        jurisdictions: selectedJurisdictions,
+                        minYear: minYearStr,
+                        maxYear: maxYearStr,
+                        fokus: term,
+                      })}
                       aria-current={term === fokus ? 'true' : undefined}
                       className={
                         term === fokus
@@ -345,7 +378,11 @@ export default async function AnalysePage({ searchParams }: AnalysePageProps) {
 
           <section className="pb-10">
             <div className="max-w-6xl mx-auto px-6 overflow-x-auto">
-              <Heatmap mentionsData={mentionsData} years={heatmapYears} />
+              <Heatmap
+                mentionsData={mentionsData}
+                years={heatmapYears}
+                highlighted={selectedJurisdictions}
+              />
             </div>
           </section>
 

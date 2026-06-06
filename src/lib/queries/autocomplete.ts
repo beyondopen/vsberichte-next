@@ -7,7 +7,10 @@ import pool from '@/lib/db'
  * - For multi-token queries: prefix match on last token, filtered to documents
  *   containing all previous tokens
  */
-export async function getAutocompleteSuggestions(query: string): Promise<string[]> {
+export async function getAutocompleteSuggestions(
+  query: string,
+  limit = 10
+): Promise<string[]> {
   const qOrig = query.toLowerCase().trim()
   if (qOrig === '') return []
 
@@ -59,13 +62,13 @@ export async function getAutocompleteSuggestions(query: string): Promise<string[
     tokens = result.rows.map(r => r.token)
   }
 
-  // Deduplicate while preserving order, take top 10
+  // Deduplicate while preserving order, take the top `limit`
   const unique: string[] = []
   for (const t of tokens) {
     if (!unique.includes(t)) {
       unique.push(t)
     }
-    if (unique.length >= 10) break
+    if (unique.length >= limit) break
   }
 
   // Prepend previous tokens for multi-token queries

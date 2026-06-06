@@ -1,4 +1,15 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+/**
+ * Open the jurisdiction combobox and toggle one option. The button#
+ * selector only matches the hydrated combobox, not the pre-mount native
+ * <select> fallback that shares the id.
+ */
+async function toggleJurisdiction(page: Page, name: string) {
+  await page.locator('button#filter-jurisdiction').click()
+  await page.getByRole('option', { name, exact: true }).click()
+  await page.keyboard.press('Escape')
+}
 
 test.describe('Search', () => {
   test('shows search form', async ({ page }) => {
@@ -23,19 +34,38 @@ test.describe('Search', () => {
 
   test('has working filters', async ({ page }) => {
     await page.goto('/suche')
-    await expect(page.locator('select[name="jurisdiction"]')).toBeVisible()
+    // Jurisdiction combobox (replaces the native select after hydration)
+    await expect(page.locator('#filter-jurisdiction')).toBeVisible()
     await expect(page.locator('input[name="min_year"]')).toBeVisible()
     await expect(page.locator('input[name="max_year"]')).toBeVisible()
     // Dual-thumb year slider mounts after hydration
     await expect(page.getByRole('slider')).toHaveCount(2)
   })
 
-  test('jurisdiction select applies instantly without submit', async ({ page }) => {
+  test('jurisdiction combobox applies instantly without submit', async ({ page }) => {
     await page.goto('/suche?q=NSU')
     await expect(page.locator('article').first()).toBeVisible()
-    await page.locator('select[name="jurisdiction"]').selectOption('Bund')
+    await toggleJurisdiction(page, 'Bund')
     await expect(page).toHaveURL(/jurisdiction=Bund/)
     await expect(page).toHaveURL(/q=NSU/)
+    await expect(page.locator('#filter-jurisdiction')).toContainText('Bund')
+  })
+
+  test('jurisdiction combobox supports multiple selections', async ({ page }) => {
+    await page.goto('/suche?q=Verfassungsschutz')
+    await page.locator('button#filter-jurisdiction').click()
+    await page.getByRole('option', { name: 'Bund', exact: true }).click()
+    await page.getByRole('option', { name: 'Bayern', exact: true }).click()
+    await page.keyboard.press('Escape')
+    await expect(page).toHaveURL(/jurisdiction=Bund&jurisdiction=Bayern/)
+    await expect(page.locator('#filter-jurisdiction')).toContainText('Bund, Bayern')
+  })
+
+  test('deselecting in the combobox removes the param again', async ({ page }) => {
+    await page.goto('/suche?q=NSU&jurisdiction=Bund')
+    await toggleJurisdiction(page, 'Bund')
+    await expect(page).not.toHaveURL(/jurisdiction=/)
+    await expect(page.locator('#filter-jurisdiction')).toContainText('Alle Behörden')
   })
 
   test('typing applies the search after a pause', async ({ page }) => {
@@ -61,9 +91,48 @@ test.describe('Search', () => {
 
   test('filter change resets pagination', async ({ page }) => {
     await page.goto('/suche?q=Verfassungsschutz&seite=2')
-    await page.locator('select[name="jurisdiction"]').selectOption('Bund')
+    await toggleJurisdiction(page, 'Bund')
     await expect(page).toHaveURL(/jurisdiction=Bund/)
     expect(page.url()).not.toContain('seite=')
+  })
+
+  test('search input shows autocomplete suggestions', async ({ page }) => {
+    await page.goto('/suche')
+    await page.locator('#search-input').pressSequentially('nsu')
+    const listbox = page.getByRole('listbox')
+    await expect(listbox).toBeVisible()
+    await expect(listbox.getByRole('option').first()).toContainText(/nsu/i)
+  })
+
+  test('picking a suggestion via keyboard applies it instantly', async ({ page }) => {
+    await page.goto('/suche')
+    const input = page.locator('#search-input')
+    await input.pressSequentially('nsu')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await input.press('ArrowDown')
+    await input.press('Enter')
+    await expect(page).toHaveURL(/q=nsu/)
+    await expect(page.getByRole('listbox')).not.toBeVisible()
+  })
+
+  test('clicking a suggestion applies it instantly', async ({ page }) => {
+    await page.goto('/suche')
+    const input = page.locator('#search-input')
+    await input.pressSequentially('nsu')
+    const listbox = page.getByRole('listbox')
+    await expect(listbox).toBeVisible()
+    await listbox.getByRole('option', { name: 'nsu', exact: true }).click()
+    await expect(page).toHaveURL(/q=nsu(&|$)/)
+    await expect(input).toHaveValue('nsu')
+  })
+
+  test('Escape closes the suggestion dropdown', async ({ page }) => {
+    await page.goto('/suche')
+    const input = page.locator('#search-input')
+    await input.pressSequentially('nsu')
+    await expect(page.getByRole('listbox')).toBeVisible()
+    await input.press('Escape')
+    await expect(page.getByRole('listbox')).not.toBeVisible()
   })
 
   test('pagination works', async ({ page }) => {

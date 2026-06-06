@@ -1,49 +1,30 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAutocomplete } from '@/components/search/useAutocomplete'
+import AutocompleteList from '@/components/search/AutocompleteList'
 
 interface SearchFormProps {
   defaultValue?: string
   size?: 'sm' | 'lg'
 }
 
+/**
+ * Homepage search: controlled input that navigates to /suche on submit,
+ * with the shared autocomplete dropdown (useAutocomplete). Picking a
+ * suggestion navigates immediately. Without JavaScript the plain GET form
+ * submits to /suche as before.
+ */
 export default function SearchForm({
   defaultValue = '',
   size = 'sm',
 }: SearchFormProps) {
   const [query, setQuery] = useState(defaultValue)
-  const [suggestions, setSuggestions] = useState<string[]>([])
-  const [showDropdown, setShowDropdown] = useState(false)
-  const [activeIndex, setActiveIndex] = useState(-1)
-  const wrapperRef = useRef<HTMLDivElement>(null)
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>(null)
   const router = useRouter()
-
-  const fetchSuggestions = useCallback((q: string) => {
-    if (q.length < 2) {
-      setSuggestions([])
-      setShowDropdown(false)
-      return
-    }
-    if (debounceRef.current) clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(async () => {
-      try {
-        const res = await fetch(`/api/auto-complete?q=${encodeURIComponent(q)}`)
-        if (!res.ok) return
-        const data: string[] = await res.json()
-        setSuggestions(data)
-        setShowDropdown(data.length > 0)
-        setActiveIndex(-1)
-      } catch {
-        // ignore
-      }
-    }, 200)
-  }, [])
 
   const submitSearch = useCallback(
     (q: string) => {
-      setShowDropdown(false)
       if (q.trim()) {
         router.push(`/suche?q=${encodeURIComponent(q.trim())}`)
       }
@@ -51,32 +32,8 @@ export default function SearchForm({
     [router]
   )
 
-  // Close dropdown on outside click
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setShowDropdown(false)
-      }
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  function handleKeyDown(e: React.KeyboardEvent) {
-    if (!showDropdown || suggestions.length === 0) return
-    if (e.key === 'ArrowDown') {
-      e.preventDefault()
-      setActiveIndex((i) => (i < suggestions.length - 1 ? i + 1 : 0))
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault()
-      setActiveIndex((i) => (i > 0 ? i - 1 : suggestions.length - 1))
-    } else if (e.key === 'Enter' && activeIndex >= 0) {
-      e.preventDefault()
-      submitSearch(suggestions[activeIndex])
-    } else if (e.key === 'Escape') {
-      setShowDropdown(false)
-    }
-  }
+  const wrapperRef = useRef<HTMLDivElement>(null)
+  const ac = useAutocomplete({ onSelect: submitSearch, wrapperRef })
 
   const inputClass =
     size === 'lg'
@@ -96,6 +53,7 @@ export default function SearchForm({
         className="flex gap-3"
         onSubmit={(e) => {
           e.preventDefault()
+          ac.close()
           submitSearch(query)
         }}
       >
@@ -109,46 +67,19 @@ export default function SearchForm({
             type="search"
             placeholder="Suchbegriff eingeben&#8230;"
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value)
-              fetchSuggestions(e.target.value)
-            }}
-            onFocus={() => {
-              if (suggestions.length > 0) setShowDropdown(true)
-            }}
-            onKeyDown={handleKeyDown}
-            autoComplete="off"
-            role="combobox"
-            aria-expanded={showDropdown}
-            aria-autocomplete="list"
-            aria-controls="autocomplete-list"
+            {...ac.inputProps}
+            onChange={(e) => setQuery(e.target.value)}
             className={inputClass}
           />
-          {/* Dropdown */}
-          {showDropdown && suggestions.length > 0 && (
-            <ul
-              id="autocomplete-list"
-              role="listbox"
-              className="absolute z-50 top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg overflow-hidden"
-            >
-              {suggestions.map((suggestion, i) => (
-                <li
-                  key={suggestion}
-                  role="option"
-                  aria-selected={i === activeIndex}
-                  className={`px-4 py-2.5 text-sm cursor-pointer transition-colors ${
-                    i === activeIndex
-                      ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                      : 'text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
-                  }`}
-                  onMouseDown={() => submitSearch(suggestion)}
-                  onMouseEnter={() => setActiveIndex(i)}
-                >
-                  {suggestion}
-                </li>
-              ))}
-            </ul>
-          )}
+          <AutocompleteList
+            suggestions={ac.suggestions}
+            open={ac.open}
+            activeIndex={ac.activeIndex}
+            listId={ac.listId}
+            optionId={ac.optionId}
+            onPick={ac.pick}
+            onHover={ac.setActiveIndex}
+          />
         </div>
         <button type="submit" className={buttonClass}>
           Suchen

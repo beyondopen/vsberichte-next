@@ -54,9 +54,11 @@ Both data sections render only when terms exist. Optional: wrap each section in 
 - Heatmap: `getMentions(fokusTerm, { minYear, maxYear })` — unchanged.
 - Note: the chart has data only from 1993 (`TRENDS_MIN_YEAR`, coverage cutoff); the heatmap goes further back. Slider bounds stay global (`getYearBounds()`) — the chart simply starts at 1993.
 
-### Jurisdiction filter — considered, deferred
+### Jurisdiction filter — considered, deferred → now designed
 
 `getTermStats` even supports `jurisdiction`, so a Behörde filter on the chart is cheap. But the heatmap *is* the jurisdiction comparison — a filter that affects one section and not the other is confusing. Deferred; if wanted later: filter applies to chart + highlights the matching heatmap row.
+
+**Update:** designed in `2026-06-06-jurisdiction-multiselect-design.md` — multi-select (consistent with /berichte and /suche), chart uses a pooled relative frequency over the selection (denominator restricted to the same jurisdictions), heatmap stays unfiltered with the selected rows highlighted.
 
 ### Redirects & link updates
 
@@ -73,8 +75,8 @@ Both data sections render only when terms exist. Optional: wrap each section in 
 
 ## 4. Out of scope
 
-- Jurisdiction filter on the chart (see above)
-- Autocomplete on the term input (same open question as on /suche)
+- ~~Jurisdiction filter on the chart (see above)~~ — now designed, see `2026-06-06-jurisdiction-multiselect-design.md`
+- ~~Autocomplete on the term input (same open question as on /suche)~~ — now designed, see `2026-06-06-autocomplete-input-design.md`
 - Combining with /suche in any way — search stays its own page
 
 ## Open questions

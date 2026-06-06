@@ -9,12 +9,15 @@ interface TermTagsProps {
   basePath?: string
   /** Extra query params to carry in every link (e.g. min_year/max_year). */
   extraParams?: Record<string, string>
+  /** Repeated query params to carry in every link (e.g. jurisdiction). */
+  multiParams?: Record<string, string[]>
 }
 
 function termsUrl(
   basePath: string,
   terms: string[],
-  extraParams: Record<string, string>
+  extraParams: Record<string, string>,
+  multiParams: Record<string, string[]>
 ): string {
   const params = new URLSearchParams()
   for (const term of terms) {
@@ -22,6 +25,9 @@ function termsUrl(
   }
   for (const [key, value] of Object.entries(extraParams)) {
     if (value) params.set(key, value)
+  }
+  for (const [key, values] of Object.entries(multiParams)) {
+    for (const value of values) params.append(key, value)
   }
   const qs = params.toString()
   return qs ? `${basePath}?${qs}` : basePath
@@ -38,6 +44,7 @@ export default function TermTags({
   suggestions,
   basePath = '/analyse',
   extraParams = {},
+  multiParams = {},
 }: TermTagsProps) {
   return (
     <>
@@ -50,7 +57,7 @@ export default function TermTags({
             >
               {term}
               <Link
-                href={termsUrl(basePath, terms.filter((t) => t !== term), extraParams)}
+                href={termsUrl(basePath, terms.filter((t) => t !== term), extraParams, multiParams)}
                 aria-label={`${term} entfernen`}
                 className="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-blue-600 transition-colors"
               >
@@ -80,7 +87,7 @@ export default function TermTags({
               asChild
               className="h-auto rounded-full text-sm font-normal px-3 py-1 cursor-pointer"
             >
-              <Link href={termsUrl(basePath, [...terms, suggestion], extraParams)}>
+              <Link href={termsUrl(basePath, [...terms, suggestion], extraParams, multiParams)}>
                 {suggestion}
               </Link>
             </Badge>

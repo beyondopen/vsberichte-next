@@ -3,6 +3,7 @@ import {
   jurisdictions,
   jurisdictionToSlug,
   slugToJurisdiction,
+  normalizeJurisdictions,
 } from '@/lib/jurisdictions'
 
 describe('jurisdictions', () => {
@@ -62,5 +63,35 @@ describe('round-trip slug conversion', () => {
     const original = 'Baden-Württemberg'
     const roundTripped = slugToJurisdiction(jurisdictionToSlug(original))
     expect(roundTripped).toBe('Baden-Württemberg')
+  })
+})
+
+describe('normalizeJurisdictions', () => {
+  it('returns [] for undefined and empty string', () => {
+    expect(normalizeJurisdictions(undefined)).toEqual([])
+    expect(normalizeJurisdictions('')).toEqual([])
+  })
+
+  it('wraps a single legacy value in an array', () => {
+    expect(normalizeJurisdictions('Bayern')).toEqual(['Bayern'])
+  })
+
+  it('accepts repeated params as an array', () => {
+    expect(normalizeJurisdictions(['Bund', 'Bayern'])).toEqual(['Bayern', 'Bund'])
+  })
+
+  it('sorts for cache-key stability regardless of param order', () => {
+    expect(normalizeJurisdictions(['Bund', 'Bayern'])).toEqual(
+      normalizeJurisdictions(['Bayern', 'Bund'])
+    )
+  })
+
+  it('drops unknown values silently', () => {
+    expect(normalizeJurisdictions(['Bayern', 'Atlantis'])).toEqual(['Bayern'])
+    expect(normalizeJurisdictions('Atlantis')).toEqual([])
+  })
+
+  it('de-duplicates', () => {
+    expect(normalizeJurisdictions(['Bund', 'Bund'])).toEqual(['Bund'])
   })
 })

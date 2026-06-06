@@ -42,6 +42,18 @@ test.describe('Without JavaScript', () => {
     await expect(page.locator('article').first()).toBeVisible()
   })
 
+  test('suche: multiple jurisdictions via the native multi-select', async () => {
+    await page.goto('/suche')
+    await page.locator('#search-input').fill('Verfassungsschutz')
+    // Without JS the jurisdiction control is a native <select multiple>
+    await page
+      .locator('select[name="jurisdiction"]')
+      .selectOption(['Bund', 'Bayern'])
+    await page.getByRole('button', { name: 'Suchen' }).click()
+    await expect(page).toHaveURL(/jurisdiction=Bund&jurisdiction=Bayern/)
+    await expect(page.locator('article').first()).toBeVisible()
+  })
+
   test('berichte: type filter via submit button', async () => {
     await page.goto('/berichte')
     await page.locator('select[name="type"]').selectOption('kurzfassung')

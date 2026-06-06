@@ -5,6 +5,12 @@ interface HeatmapProps {
   mentionsData: Record<string, Record<number, number>>
   /** Sorted years to render as columns. */
   years: number[]
+  /**
+   * Jurisdictions to emphasize (the chart's Behörden selection). Only the
+   * row header is accented — cell colors stay untouched so the comparison
+   * reading is unaffected.
+   */
+  highlighted?: string[]
 }
 
 /** Map a count to one of 5 blue intensity tiers */
@@ -55,7 +61,7 @@ function cellTitle(jurisdiction: string, year: number, count: number): string {
  * Jurisdictions × years heatmap of term mentions (server component).
  * Extracted from the former /regional page; used on /analyse.
  */
-export default function Heatmap({ mentionsData, years }: HeatmapProps) {
+export default function Heatmap({ mentionsData, years, highlighted = [] }: HeatmapProps) {
   return (
     <>
       <table className="heatmap-table text-xs border-collapse">
@@ -78,9 +84,20 @@ export default function Heatmap({ mentionsData, years }: HeatmapProps) {
           {jurisdictions.map((jur) => {
             const jurData = mentionsData[jur]
             if (!jurData) return null
+            const isHighlighted = highlighted.includes(jur)
             return (
-              <tr key={jur} className="border-t border-gray-100 dark:border-gray-800/50">
-                <th className="row-header bg-white dark:bg-gray-950 px-3 py-1.5 text-left font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap">
+              <tr
+                key={jur}
+                data-highlighted={isHighlighted || undefined}
+                className="border-t border-gray-100 dark:border-gray-800/50"
+              >
+                <th
+                  className={
+                    isHighlighted
+                      ? 'row-header bg-white dark:bg-gray-950 px-3 py-1.5 text-left font-bold text-blue-700 dark:text-blue-400 whitespace-nowrap border-l-2 border-blue-600 dark:border-blue-400'
+                      : 'row-header bg-white dark:bg-gray-950 px-3 py-1.5 text-left font-medium text-gray-900 dark:text-gray-100 whitespace-nowrap'
+                  }
+                >
                   {jur}
                 </th>
                 {years.map((year) => {

@@ -6,19 +6,29 @@ import pool from '@/lib/db'
 const TRENDS_MIN_YEAR = 1993
 
 /**
- * Get total token counts per year (for normalizing relative frequencies).
+ * Get total token counts per year (for normalizing relative frequencies),
+ * optionally restricted to a set of jurisdictions — the denominator must
+ * cover the same corpus slice as the numerator, otherwise the "relative"
+ * frequency would shrink just because fewer jurisdictions are selected.
  * Cached: aggregates over the full token_count table (millions of rows) and
  * runs inside every getTermStats call; the data only changes on imports.
  */
 export const getYearTotals = unstable_cache(
-  async (): Promise<Record<number, number>> => {
+  async (jurisdictions: string[] = []): Promise<Record<number, number>> => {
+    const params: (number | string[])[] = [TRENDS_MIN_YEAR]
+    let jurisdictionClause = ''
+    if (jurisdictions.length > 0) {
+      // pg binds a JS string array as a single text[] parameter
+      jurisdictionClause = ` AND d.jurisdiction = ANY($2::text[])`
+      params.push(jurisdictions)
+    }
     const result = await pool.query<{ year: number; total: string }>(
       `SELECT d.year, SUM(tc.count) as total
        FROM token_count tc
        JOIN document d ON tc.document_id = d.id
-       WHERE d.year >= $1
+       WHERE d.year >= $1${jurisdictionClause}
        GROUP BY d.year`,
-      [TRENDS_MIN_YEAR]
+      params
     )
 
     const totals: Record<number, number> = {}
@@ -32,7 +42,12 @@ export const getYearTotals = unstable_cache(
 )
 
 export interface TermStatsParams {
-  jurisdiction?: string | null
+  /**
+   * Empty array = no constraint. Callers must pass the SORTED output of
+   * normalizeJurisdictions — the args are the unstable_cache key, so
+   * param order must not fragment the cache.
+   */
+  jurisdictions?: string[]
   minYear?: number | null
   maxYear?: number | null
 }
@@ -48,19 +63,19 @@ export const getTermStats = unstable_cache(
     query: string,
     params: TermStatsParams = {}
   ): Promise<[string, Record<number, number>]> => {
-  const { jurisdiction, minYear, maxYear } = params
+  const { jurisdictions = [], minYear, maxYear } = params
 
   // Build WHERE conditions for the search
   const conditions: string[] = [
     `dp.search_vector @@ websearch_to_tsquery('pg_catalog.german', $1)`,
     `d.year >= $2`,
   ]
-  const queryParams: (string | number)[] = [query, TRENDS_MIN_YEAR]
+  const queryParams: (string | number | string[])[] = [query, TRENDS_MIN_YEAR]
   let paramIndex = 3
 
-  if (jurisdiction) {
-    conditions.push(`d.jurisdiction = $${paramIndex}`)
-    queryParams.push(jurisdiction)
+  if (jurisdictions.length > 0) {
+    conditions.push(`d.jurisdiction = ANY($${paramIndex}::text[])`)
+    queryParams.push(jurisdictions)
     paramIndex++
   }
   if (minYear != null) {
@@ -95,8 +110,9 @@ export const getTermStats = unstable_cache(
     yearCounts[row.year] = (yearCounts[row.year] || 0) + count
   }
 
-  // Normalize by year totals
-  const yearTotals = await getYearTotals()
+  // Normalize by year totals over the same jurisdiction slice (pooled
+  // relative frequency: the selection is treated as one combined corpus)
+  const yearTotals = await getYearTotals(jurisdictions)
   for (const [year, total] of Object.entries(yearTotals)) {
     const y = parseInt(year, 10)
     if (yearCounts[y] !== undefined) {

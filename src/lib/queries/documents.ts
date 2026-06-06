@@ -97,7 +97,8 @@ export const getYearBounds = unstable_cache(
 export interface DocumentFilter {
   documentType?: string
   language?: string
-  jurisdiction?: string
+  /** Empty array = no constraint (all jurisdictions). */
+  jurisdictions?: string[]
   minYear?: number
   maxYear?: number
 }
@@ -107,7 +108,7 @@ export interface DocumentFilter {
  */
 export async function getFilteredDocuments(filters: DocumentFilter = {}): Promise<Document[]> {
   let query = 'SELECT * FROM document WHERE 1=1'
-  const params: (string | number)[] = []
+  const params: (string | number | string[])[] = []
   let paramIdx = 1
 
   if (filters.documentType && filters.documentType !== 'alle') {
@@ -118,9 +119,10 @@ export async function getFilteredDocuments(filters: DocumentFilter = {}): Promis
     query += ` AND language = $${paramIdx++}`
     params.push(filters.language)
   }
-  if (filters.jurisdiction) {
-    query += ` AND jurisdiction = $${paramIdx++}`
-    params.push(filters.jurisdiction)
+  if (filters.jurisdictions && filters.jurisdictions.length > 0) {
+    // pg binds a JS string array as a single text[] parameter
+    query += ` AND jurisdiction = ANY($${paramIdx++}::text[])`
+    params.push(filters.jurisdictions)
   }
   if (filters.minYear) {
     query += ` AND year >= $${paramIdx++}`

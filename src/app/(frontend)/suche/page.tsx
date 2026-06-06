@@ -2,13 +2,17 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { searchDocumentPages, extractSearchTokens } from '@/lib/queries/search'
 import { getHighlightBoxes } from '@/lib/wordpos'
-import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
+import {
+  jurisdictions,
+  jurisdictionToSlug,
+  normalizeJurisdictions,
+} from '@/lib/jurisdictions'
 import Pagination from '@/components/Pagination'
 import SearchResultImage from '@/components/SearchResultImage'
 import FilterPanel from '@/components/filters/FilterPanel'
 import { FilterSubmit } from '@/components/filters/FilterBar'
 import SearchInput from '@/components/filters/SearchInput'
-import SelectFilter from '@/components/filters/SelectFilter'
+import MultiSelectFilter from '@/components/filters/MultiSelectFilter'
 import YearRangeFilter from '@/components/filters/YearRangeFilter'
 import { getYearBounds } from '@/lib/queries/documents'
 
@@ -23,7 +27,7 @@ export const metadata: Metadata = {
 interface SearchPageProps {
   searchParams: Promise<{
     q?: string
-    jurisdiction?: string
+    jurisdiction?: string | string[]
     min_year?: string
     max_year?: string
     seite?: string
@@ -33,7 +37,7 @@ interface SearchPageProps {
 export default async function SuchePage({ searchParams }: SearchPageProps) {
   const params = await searchParams
   const q = params.q ?? ''
-  const jurisdiction = params.jurisdiction || ''
+  const selectedJurisdictions = normalizeJurisdictions(params.jurisdiction)
   const minYearStr = params.min_year || ''
   const maxYearStr = params.max_year || ''
   const page = parseInt(params.seite || '1', 10) || 1
@@ -49,7 +53,7 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
 
   if (hasQuery) {
     results = await searchDocumentPages(q, {
-      jurisdiction: jurisdiction || null,
+      jurisdictions: selectedJurisdictions,
       minYear: isNaN(minYear as number) ? null : minYear,
       maxYear: isNaN(maxYear as number) ? null : maxYear,
       page,
@@ -69,7 +73,7 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
   // Build base URL for pagination
   const paginationParams = new URLSearchParams()
   if (q) paginationParams.set('q', q)
-  if (jurisdiction) paginationParams.set('jurisdiction', jurisdiction)
+  for (const j of selectedJurisdictions) paginationParams.append('jurisdiction', j)
   if (minYearStr) paginationParams.set('min_year', minYearStr)
   if (maxYearStr) paginationParams.set('max_year', maxYearStr)
   const baseUrl = `/suche?${paginationParams.toString()}`
@@ -99,18 +103,20 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
                 label="Suchbegriff"
                 defaultValue={q}
                 placeholder="Suchbegriff eingeben..."
+                autocomplete
               />
               <FilterSubmit className="px-8 py-3.5 text-base">Suchen</FilterSubmit>
             </div>
             {/* Filters row */}
             <div className="flex flex-wrap items-end gap-3">
-              <SelectFilter
+              <MultiSelectFilter
                 id="filter-jurisdiction"
                 name="jurisdiction"
                 label="Behörde"
                 allLabel="Alle Behörden"
+                countNoun="Behörden"
                 options={jurisdictions}
-                defaultValue={jurisdiction}
+                selected={selectedJurisdictions}
               />
               <YearRangeFilter
                 minLimit={yearBounds.minYear}

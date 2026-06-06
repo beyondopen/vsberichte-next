@@ -44,6 +44,15 @@ describe('buildFilterUrl', () => {
     expect(url).toBe('/trends?q=linksextrem&q=rechtsextrem&term=cyber')
   })
 
+  it('keeps repeated jurisdiction params (multi-select)', () => {
+    const url = buildFilterUrl('/suche', [
+      ['q', 'NSU'],
+      ['jurisdiction', 'Bayern'],
+      ['jurisdiction', 'Bund'],
+    ])
+    expect(url).toBe('/suche?q=NSU&jurisdiction=Bayern&jurisdiction=Bund')
+  })
+
   it('swaps an inverted year range', () => {
     const url = buildFilterUrl('/berichte', [
       ['min_year', '2020'],

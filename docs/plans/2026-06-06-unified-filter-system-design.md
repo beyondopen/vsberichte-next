@@ -151,6 +151,6 @@ All four pages — including `FilterBar` and the selects — stay **server compo
 
 ## 7. Open questions
 
-1. Should jurisdiction become **multi-select** (e.g. compare Bund + Bayern)? Backend query supports a single value today — would touch the data layer. Out of scope here, but the `SelectFilter` API should not block it.
+1. ~~Should jurisdiction become **multi-select** (e.g. compare Bund + Bayern)?~~ **Resolved: yes, later effort** — see `2026-06-06-jurisdiction-multiselect-design.md`. The `SelectFilter` API did not block it: a sibling `MultiSelectFilter` (shadcn Combobox + native `<select multiple>` fallback) replaces the jurisdiction control; type/language stay native single selects.
 2. ~~Derive slider min year from actual data instead of hardcoded 1950?~~ **Resolved: yes** — `getYearBounds()` queries `MIN/MAX(year)` (cached, `corpus` tag); 1950/current year remain only as empty-DB fallback.
-3. Should the page-level `SearchInput` get the navbar's autocomplete dropdown (shared component) in this effort or later?
+3. ~~Should the page-level `SearchInput` get the navbar's autocomplete dropdown (shared component) in this effort or later?~~ **Resolved: later effort** — see `2026-06-06-autocomplete-input-design.md` (shared `useAutocomplete` hook for the homepage form, /suche and the /analyse term input).

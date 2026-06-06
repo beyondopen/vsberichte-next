@@ -84,10 +84,18 @@ describe('documents queries (integration)', () => {
   })
 
   it('getFilteredDocuments filters by jurisdiction', async () => {
-    const bayern = await getFilteredDocuments({ jurisdiction: 'Bayern' })
+    const bayern = await getFilteredDocuments({ jurisdictions: ['Bayern'] })
     expect(bayern.length).toBeGreaterThanOrEqual(1)
     for (const doc of bayern) {
       expect(doc.jurisdiction).toBe('Bayern')
+    }
+  })
+
+  it('getFilteredDocuments filters by multiple jurisdictions', async () => {
+    const docs = await getFilteredDocuments({ jurisdictions: ['Bayern', 'Bund'] })
+    expect(docs.length).toBeGreaterThanOrEqual(1)
+    for (const doc of docs) {
+      expect(['Bayern', 'Bund']).toContain(doc.jurisdiction)
     }
   })
 

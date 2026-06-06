@@ -20,10 +20,34 @@ describe('search queries (integration)', () => {
   })
 
   it('filters by jurisdiction', async () => {
-    const { results } = await searchDocumentPages('Verfassungsschutz', { jurisdiction: 'Bayern' })
+    const { results } = await searchDocumentPages('Verfassungsschutz', {
+      jurisdictions: ['Bayern'],
+    })
     for (const r of results) {
       expect(r.jurisdiction).toBe('Bayern')
     }
+  })
+
+  it('filters by multiple jurisdictions', async () => {
+    const { results, total } = await searchDocumentPages('Verfassungsschutz', {
+      jurisdictions: ['Bayern', 'Bund'],
+    })
+    for (const r of results) {
+      expect(['Bayern', 'Bund']).toContain(r.jurisdiction)
+    }
+    // Superset of the single-jurisdiction result
+    const { total: bayernTotal } = await searchDocumentPages('Verfassungsschutz', {
+      jurisdictions: ['Bayern'],
+    })
+    expect(total).toBeGreaterThanOrEqual(bayernTotal)
+  })
+
+  it('treats an empty jurisdictions array as no constraint', async () => {
+    const { total: allTotal } = await searchDocumentPages('Verfassungsschutz')
+    const { total: emptyTotal } = await searchDocumentPages('Verfassungsschutz', {
+      jurisdictions: [],
+    })
+    expect(emptyTotal).toBe(allTotal)
   })
 
   it('filters by year range', async () => {

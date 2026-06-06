@@ -14,7 +14,8 @@ export interface SearchResult {
 }
 
 export interface SearchParams {
-  jurisdiction?: string | null
+  /** Empty array = no constraint (all jurisdictions). */
+  jurisdictions?: string[]
   minYear?: number | null
   maxYear?: number | null
   page?: number
@@ -29,19 +30,20 @@ export async function searchDocumentPages(
   query: string,
   params: SearchParams = {}
 ): Promise<{ results: SearchResult[]; total: number; yearCounts: Record<number, number> }> {
-  const { jurisdiction, minYear, maxYear, page = 1, perPage = 20 } = params
+  const { jurisdictions, minYear, maxYear, page = 1, perPage = 20 } = params
   const offset = (page - 1) * perPage
 
   // Build WHERE conditions
   const conditions: string[] = [
     `dp.search_vector @@ websearch_to_tsquery('pg_catalog.german', $1)`,
   ]
-  const queryParams: (string | number)[] = [query]
+  const queryParams: (string | number | string[])[] = [query]
   let paramIndex = 2
 
-  if (jurisdiction) {
-    conditions.push(`d.jurisdiction = $${paramIndex}`)
-    queryParams.push(jurisdiction)
+  if (jurisdictions && jurisdictions.length > 0) {
+    // pg binds a JS string array as a single text[] parameter
+    conditions.push(`d.jurisdiction = ANY($${paramIndex}::text[])`)
+    queryParams.push(jurisdictions)
     paramIndex++
   }
   if (minYear != null) {
