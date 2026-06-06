@@ -35,6 +35,15 @@ const nextConfig: NextConfig = {
       { source: '/:slug.txt', destination: '/text-export/:slug' },
     ]
   },
+  async redirects() {
+    // /trends and /regional were merged into /analyse; query strings
+    // (q, term, remove, min_year, max_year) pass through unchanged and
+    // remain valid on the new page.
+    return [
+      { source: '/trends', destination: '/analyse', permanent: true },
+      { source: '/regional', destination: '/analyse', permanent: true },
+    ]
+  },
 }
 
 export default withPayload(nextConfig)

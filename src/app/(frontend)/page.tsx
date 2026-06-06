@@ -44,10 +44,10 @@ export default async function HomePage() {
                   Berichte durchsuchen
                 </Link>
                 <Link
-                  href="/trends"
+                  href="/analyse"
                   className="inline-flex items-center px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg font-medium text-gray-700 dark:text-gray-300 hover:border-gray-400 dark:hover:border-gray-500 transition-colors"
                 >
-                  Trends entdecken
+                  Analyse entdecken
                 </Link>
               </div>
             </div>
@@ -89,10 +89,10 @@ export default async function HomePage() {
                   compact
                 />
                 <Link
-                  href="/trends"
+                  href="/analyse"
                   className="inline-flex items-center text-blue-700 dark:text-blue-400 text-sm font-medium mt-4 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                 >
-                  Trends entdecken &rarr;
+                  Analyse entdecken &rarr;
                 </Link>
               </div>
             </div>
@@ -166,10 +166,10 @@ export default async function HomePage() {
                 Begriffe in interaktiven Charts.
               </p>
               <Link
-                href="/trends"
+                href="/analyse"
                 className="text-blue-700 dark:text-blue-400 text-sm font-medium hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
               >
-                Trends ansehen &rarr;
+                Begriffe analysieren &rarr;
               </Link>
             </div>
             {/* Feature 3: Regional */}
@@ -185,10 +185,10 @@ export default async function HomePage() {
                 entdecke regionale Unterschiede in der Berichterstattung.
               </p>
               <Link
-                href="/regional"
+                href="/analyse"
                 className="text-blue-700 dark:text-blue-400 text-sm font-medium hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
               >
-                Regionale Analyse &rarr;
+                Regional vergleichen &rarr;
               </Link>
             </div>
           </div>

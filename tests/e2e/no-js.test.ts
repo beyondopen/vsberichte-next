@@ -58,24 +58,38 @@ test.describe('Without JavaScript', () => {
     await expect(page.locator('article').first()).toBeVisible()
   })
 
-  test('regional: heatmap via submit button', async () => {
-    await page.goto('/regional')
-    await page.locator('#regional-input').fill('NSU')
-    await page.getByRole('button', { name: 'Analysieren' }).click()
-    await expect(page).toHaveURL(/q=NSU/)
-    await expect(page.locator('table').first()).toBeVisible()
-  })
-
-  test('trends: add term via button, remove via pill, data table as fallback', async () => {
-    await page.goto('/trends')
-    await page.locator('#term-input').fill('cyber')
+  test('analyse: add term via button shows chart fallback and heatmap', async () => {
+    await page.goto('/analyse')
+    await page.locator('#term-input').fill('NSU')
     await page.getByRole('button', { name: 'Hinzufügen' }).click()
-    await expect(page).toHaveURL(/term=cyber/)
+    await expect(page).toHaveURL(/term=NSU/)
     // Chart needs JS — the collapsible data table is the fallback
     await expect(page.getByText('Daten als Tabelle anzeigen')).toBeVisible()
+    // Heatmap is server-rendered
+    await expect(page.locator('.heatmap-table')).toBeVisible()
+  })
 
+  test('analyse: remove term via pill works', async () => {
+    await page.goto('/analyse?q=cyber')
     await page.getByLabel('cyber entfernen').click()
-    await expect(page).toHaveURL(/\/trends$/)
+    await expect(page).toHaveURL(/\/analyse$/)
+  })
+
+  test('analyse: heatmap fokus switch works via plain links', async () => {
+    await page.goto('/analyse?q=NSU&q=NPD')
+    await expect(page.getByText(/Erwähnungen von .NSU. nach Region und Jahr/)).toBeVisible()
+    await page.getByRole('link', { name: 'NPD', exact: true }).click()
+    await expect(page).toHaveURL(/fokus=NPD/)
+    await expect(page.getByText(/Erwähnungen von .NPD. nach Region und Jahr/)).toBeVisible()
+    await expect(page.locator('.heatmap-table')).toBeVisible()
+  })
+
+  test('analyse: year range narrows heatmap via submit', async () => {
+    await page.goto('/analyse?q=NSU')
+    await page.locator('input[name="min_year"]').fill('2015')
+    await page.getByRole('button', { name: 'Hinzufügen' }).click()
+    await expect(page).toHaveURL(/min_year=2015/)
+    await expect(page.locator('.heatmap-table')).toBeVisible()
   })
 
   test('homepage search submits as plain GET form', async () => {

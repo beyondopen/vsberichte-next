@@ -39,18 +39,10 @@ export default function Footer() {
               </li>
               <li>
                 <Link
-                  href="/trends"
+                  href="/analyse"
                   className="hover:text-white transition-colors"
                 >
-                  Trend-Analyse
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/regional"
-                  className="hover:text-white transition-colors"
-                >
-                  Regionale Analyse
+                  Analyse
                 </Link>
               </li>
             </ul>

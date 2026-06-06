@@ -7,24 +7,38 @@ interface TermTagsProps {
   /** Suggested terms; already-active ones are filtered out. */
   suggestions: string[]
   basePath?: string
+  /** Extra query params to carry in every link (e.g. min_year/max_year). */
+  extraParams?: Record<string, string>
 }
 
-function termsUrl(basePath: string, terms: string[]): string {
+function termsUrl(
+  basePath: string,
+  terms: string[],
+  extraParams: Record<string, string>
+): string {
   const params = new URLSearchParams()
   for (const term of terms) {
     params.append('q', term)
+  }
+  for (const [key, value] of Object.entries(extraParams)) {
+    if (value) params.set(key, value)
   }
   const qs = params.toString()
   return qs ? `${basePath}?${qs}` : basePath
 }
 
 /**
- * Active term pills + suggestions for /trends (server component).
+ * Active term pills + suggestions for /analyse (server component).
  *
  * Add/remove are plain links over the q params — they work without
  * JavaScript and as instant client navigation with it.
  */
-export default function TermTags({ terms, suggestions, basePath = '/trends' }: TermTagsProps) {
+export default function TermTags({
+  terms,
+  suggestions,
+  basePath = '/analyse',
+  extraParams = {},
+}: TermTagsProps) {
   return (
     <>
       {terms.length > 0 && (
@@ -36,7 +50,7 @@ export default function TermTags({ terms, suggestions, basePath = '/trends' }: T
             >
               {term}
               <Link
-                href={termsUrl(basePath, terms.filter((t) => t !== term))}
+                href={termsUrl(basePath, terms.filter((t) => t !== term), extraParams)}
                 aria-label={`${term} entfernen`}
                 className="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-blue-600 transition-colors"
               >
@@ -66,7 +80,9 @@ export default function TermTags({ terms, suggestions, basePath = '/trends' }: T
               asChild
               className="h-auto rounded-full text-sm font-normal px-3 py-1 cursor-pointer"
             >
-              <Link href={termsUrl(basePath, [...terms, suggestion])}>{suggestion}</Link>
+              <Link href={termsUrl(basePath, [...terms, suggestion], extraParams)}>
+                {suggestion}
+              </Link>
             </Badge>
           ))}
       </div>

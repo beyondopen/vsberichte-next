@@ -11,8 +11,7 @@ test.describe('Homepage', () => {
     const nav = page.locator('nav')
     await expect(nav.getByRole('link', { name: 'Berichte', exact: true })).toBeVisible()
     await expect(nav.getByRole('link', { name: 'Suche', exact: true })).toBeVisible()
-    await expect(nav.getByRole('link', { name: 'Trends', exact: true })).toBeVisible()
-    await expect(nav.getByRole('link', { name: 'Regional', exact: true })).toBeVisible()
+    await expect(nav.getByRole('link', { name: 'Analyse', exact: true })).toBeVisible()
     await expect(nav.getByRole('link', { name: 'News', exact: true })).toBeVisible()
   })
 

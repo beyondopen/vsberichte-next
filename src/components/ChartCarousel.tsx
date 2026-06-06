@@ -132,10 +132,10 @@ export default function ChartCarousel() {
             Die interaktiven Charts ben&ouml;tigen JavaScript.
           </p>
           <Link
-            href="/trends"
+            href="/analyse"
             className="text-blue-700 dark:text-blue-400 font-medium hover:underline"
           >
-            Zur Trend-Analyse mit Datentabelle &rarr;
+            Zur Analyse mit Datentabelle &rarr;
           </Link>
         </div>
       </noscript>

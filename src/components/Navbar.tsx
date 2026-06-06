@@ -6,8 +6,7 @@ import { VsbMark } from "@/components/VsbMark";
 const links = [
   { href: "/berichte", label: "Berichte" },
   { href: "/suche", label: "Suche" },
-  { href: "/trends", label: "Trends" },
-  { href: "/regional", label: "Regional" },
+  { href: "/analyse", label: "Analyse" },
   { href: "/news", label: "News" },
 ];
 
