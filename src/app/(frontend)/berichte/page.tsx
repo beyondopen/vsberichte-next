@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { getIndex, getFilteredDocuments, getYearBounds } from '@/lib/queries/documents'
 import { reportInfo, documentTypeLabels } from '@/lib/report-info'
 import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
-import FilterBar, { FilterSubmit } from '@/components/filters/FilterBar'
+import FilterPanel from '@/components/filters/FilterPanel'
+import { FilterSubmit } from '@/components/filters/FilterBar'
 import SelectFilter from '@/components/filters/SelectFilter'
 import YearRangeFilter from '@/components/filters/YearRangeFilter'
 import { documentTypeOptions, languageOptions } from '@/components/filters/filter-constants'
@@ -104,47 +105,41 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
       {/* Filter Bar */}
       <section className="pb-8">
         <div className="max-w-6xl mx-auto px-6">
-          <FilterBar action="/berichte">
-            <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
-              <div className="flex flex-wrap items-end gap-3">
-                <SelectFilter
-                  id="filter-type"
-                  name="type"
-                  label="Dokumenttyp"
-                  labelVisible
-                  options={documentTypeOptions}
-                  defaultValue={type}
-                />
-                <SelectFilter
-                  id="filter-language"
-                  name="language"
-                  label="Sprache"
-                  labelVisible
-                  allLabel="Alle Sprachen"
-                  options={languageOptions}
-                  defaultValue={languageFilter}
-                />
-                <SelectFilter
-                  id="filter-jurisdiction"
-                  name="jurisdiction"
-                  label="Behörde"
-                  labelVisible
-                  allLabel="Alle Behörden"
-                  options={jurisdictions}
-                  defaultValue={jurisdictionFilter}
-                />
-                <YearRangeFilter
-                  label="Zeitraum"
-                  labelVisible
-                  minLimit={yearBounds.minYear}
-                  maxLimit={yearBounds.maxYear}
-                  defaultMin={minYearStr}
-                  defaultMax={maxYearStr}
-                />
-                <FilterSubmit>Filtern</FilterSubmit>
-              </div>
+          <FilterPanel action="/berichte">
+            <div className="flex flex-wrap items-end gap-3">
+              <SelectFilter
+                id="filter-type"
+                name="type"
+                label="Dokumenttyp"
+                options={documentTypeOptions}
+                defaultValue={type}
+              />
+              <SelectFilter
+                id="filter-language"
+                name="language"
+                label="Sprache"
+                allLabel="Alle Sprachen"
+                options={languageOptions}
+                defaultValue={languageFilter}
+              />
+              <SelectFilter
+                id="filter-jurisdiction"
+                name="jurisdiction"
+                label="Behörde"
+                allLabel="Alle Behörden"
+                options={jurisdictions}
+                defaultValue={jurisdictionFilter}
+              />
+              <YearRangeFilter
+                label="Zeitraum"
+                minLimit={yearBounds.minYear}
+                maxLimit={yearBounds.maxYear}
+                defaultMin={minYearStr}
+                defaultMax={maxYearStr}
+              />
+              <FilterSubmit>Filtern</FilterSubmit>
             </div>
-          </FilterBar>
+          </FilterPanel>
         </div>
       </section>
 

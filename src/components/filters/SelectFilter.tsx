@@ -9,7 +9,7 @@ interface SelectFilterProps {
   id: string
   name: string
   label: string
-  /** Render the label above the control (berichte) instead of sr-only (suche). */
+  /** Visible label above the control (default); set false for sr-only. */
   labelVisible?: boolean
   /** Text for an "all" option with empty value, e.g. "Alle Behörden". Omit to skip. */
   allLabel?: string
@@ -29,7 +29,7 @@ export default function SelectFilter({
   id,
   name,
   label,
-  labelVisible = false,
+  labelVisible = true,
   allLabel,
   options,
   defaultValue = '',

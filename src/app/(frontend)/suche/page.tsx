@@ -5,7 +5,8 @@ import { getHighlightBoxes } from '@/lib/wordpos'
 import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
 import Pagination from '@/components/Pagination'
 import SearchResultImage from '@/components/SearchResultImage'
-import FilterBar, { FilterSubmit } from '@/components/filters/FilterBar'
+import FilterPanel from '@/components/filters/FilterPanel'
+import { FilterSubmit } from '@/components/filters/FilterBar'
 import SearchInput from '@/components/filters/SearchInput'
 import SelectFilter from '@/components/filters/SelectFilter'
 import YearRangeFilter from '@/components/filters/YearRangeFilter'
@@ -90,9 +91,9 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
       {/* Search Form */}
       <section className="pb-12">
         <div className="max-w-6xl mx-auto px-6">
-          <FilterBar action="/suche">
-            {/* Search input */}
-            <div className="flex gap-3 mb-4">
+          <FilterPanel action="/suche">
+            {/* Search input row */}
+            <div className="flex gap-3">
               <SearchInput
                 id="search-input"
                 label="Suchbegriff"
@@ -102,7 +103,7 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
               <FilterSubmit className="px-8 py-3.5 text-base">Suchen</FilterSubmit>
             </div>
             {/* Filters row */}
-            <div className="flex flex-wrap items-center gap-3">
+            <div className="flex flex-wrap items-end gap-3">
               <SelectFilter
                 id="filter-jurisdiction"
                 name="jurisdiction"
@@ -118,7 +119,7 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
                 defaultMax={maxYearStr}
               />
             </div>
-          </FilterBar>
+          </FilterPanel>
         </div>
       </section>
 

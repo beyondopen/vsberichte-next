@@ -25,7 +25,7 @@ interface YearRangeFilterProps {
   /** Current max_year URL param value. */
   defaultMax?: string
   label?: string
-  /** Render the label above the control (berichte) instead of sr-only. */
+  /** Visible label above the control (default); set false for sr-only. */
   labelVisible?: boolean
   className?: string
 }
@@ -54,7 +54,7 @@ export default function YearRangeFilter({
   defaultMin = '',
   defaultMax = '',
   label = 'Zeitraum',
-  labelVisible = false,
+  labelVisible = true,
   className,
 }: YearRangeFilterProps) {
   const [minValue, setMinValue] = useState(defaultMin)
