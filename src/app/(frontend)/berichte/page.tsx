@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getIndex, getFilteredDocuments } from '@/lib/queries/documents'
+import { getIndex, getFilteredDocuments, getYearBounds } from '@/lib/queries/documents'
 import { reportInfo, documentTypeLabels } from '@/lib/report-info'
 import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
+import FilterBar, { FilterSubmit } from '@/components/filters/FilterBar'
+import SelectFilter from '@/components/filters/SelectFilter'
+import YearRangeFilter from '@/components/filters/YearRangeFilter'
+import { documentTypeOptions, languageOptions } from '@/components/filters/filter-constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -70,16 +74,13 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
   const displayTotal = showGrid ? total : filteredDocuments.length
 
   const currentYear = new Date().getFullYear()
+  const yearBounds = await getYearBounds()
 
   // Build a lookup map: jurisdiction -> Set of available years (for grid)
   const availableYears = new Map<string, Set<number>>()
   for (const entry of index) {
     availableYears.set(entry.jurisdiction, new Set(entry.years))
   }
-
-  // Year range for dropdowns
-  const startYear = 1950
-  const endYear = currentYear
 
   return (
     <main id="main-content">
@@ -103,118 +104,47 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
       {/* Filter Bar */}
       <section className="pb-8">
         <div className="max-w-6xl mx-auto px-6">
-          <form action="/berichte" method="get">
+          <FilterBar action="/berichte">
             <div className="bg-gray-50 dark:bg-gray-900 rounded-xl p-6">
               <div className="flex flex-wrap items-end gap-3">
-                <div>
-                  <label htmlFor="filter-type" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    Dokumenttyp
-                  </label>
-                  <select
-                    id="filter-type"
-                    name="type"
-                    defaultValue={type}
-                    className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="jahresbericht">Jahresbericht</option>
-                    <option value="kurzfassung">Kurzfassung</option>
-                    <option value="lagebild">Lagebild</option>
-                    <option value="broschuere">Brosch&uuml;re</option>
-                    <option value="kompendium">Kompendium</option>
-                    <option value="flyer">Flyer</option>
-                    <option value="parlamentarisch">Parlamentarische Fassung</option>
-                    <option value="alle">Alle Typen</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="filter-language" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    Sprache
-                  </label>
-                  <select
-                    id="filter-language"
-                    name="language"
-                    defaultValue={languageFilter}
-                    className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Alle Sprachen</option>
-                    <option value="de">Deutsch</option>
-                    <option value="en">Englisch</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="filter-jurisdiction" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    Beh&ouml;rde
-                  </label>
-                  <select
-                    id="filter-jurisdiction"
-                    name="jurisdiction"
-                    defaultValue={jurisdictionFilter}
-                    className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Alle Beh&ouml;rden</option>
-                    {jurisdictions.map((jur) => (
-                      <option key={jur} value={jur}>
-                        {jur}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="filter-min-year" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    Von
-                  </label>
-                  <select
-                    id="filter-min-year"
-                    name="min_year"
-                    defaultValue={minYearStr}
-                    className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Von</option>
-                    {Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i).map(
-                      (y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="filter-max-year" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                    Bis
-                  </label>
-                  <select
-                    id="filter-max-year"
-                    name="max_year"
-                    defaultValue={maxYearStr}
-                    className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value="">Bis</option>
-                    {Array.from({ length: endYear - startYear + 1 }, (_, i) => endYear - i).map(
-                      (y) => (
-                        <option key={y} value={y}>
-                          {y}
-                        </option>
-                      )
-                    )}
-                  </select>
-                </div>
-
-                <div>
-                  <button
-                    type="submit"
-                    className="px-6 py-2.5 bg-blue-700 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors text-sm"
-                  >
-                    Filtern
-                  </button>
-                </div>
+                <SelectFilter
+                  id="filter-type"
+                  name="type"
+                  label="Dokumenttyp"
+                  labelVisible
+                  options={documentTypeOptions}
+                  defaultValue={type}
+                />
+                <SelectFilter
+                  id="filter-language"
+                  name="language"
+                  label="Sprache"
+                  labelVisible
+                  allLabel="Alle Sprachen"
+                  options={languageOptions}
+                  defaultValue={languageFilter}
+                />
+                <SelectFilter
+                  id="filter-jurisdiction"
+                  name="jurisdiction"
+                  label="Behörde"
+                  labelVisible
+                  allLabel="Alle Behörden"
+                  options={jurisdictions}
+                  defaultValue={jurisdictionFilter}
+                />
+                <YearRangeFilter
+                  label="Zeitraum"
+                  labelVisible
+                  minLimit={yearBounds.minYear}
+                  maxLimit={yearBounds.maxYear}
+                  defaultMin={minYearStr}
+                  defaultMax={maxYearStr}
+                />
+                <FilterSubmit>Filtern</FilterSubmit>
               </div>
             </div>
-          </form>
+          </FilterBar>
         </div>
       </section>
 

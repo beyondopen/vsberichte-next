@@ -67,6 +67,33 @@ export const getIndex = unstable_cache(
   { revalidate: 3600, tags: ['corpus'] }
 )
 
+export interface YearBounds {
+  minYear: number
+  maxYear: number
+}
+
+/**
+ * Earliest and latest report year in the corpus — the bounds for the
+ * year-range filters. Falls back to 1950/current year while the DB is
+ * empty (e.g. a fresh dev setup).
+ */
+export const getYearBounds = unstable_cache(
+  async (): Promise<YearBounds> => {
+    const result = await pool.query<{ min_year: number | null; max_year: number | null }>(
+      'SELECT MIN(year) AS min_year, MAX(year) AS max_year FROM document'
+    )
+    const { min_year, max_year } = result.rows[0]
+    // Report years can't lie in the future — guards against bad ingests
+    // (e.g. test documents with year 2099).
+    const currentYear = new Date().getFullYear()
+    const maxYear = Math.min(max_year ?? currentYear, currentYear)
+    const minYear = Math.min(min_year ?? 1950, maxYear)
+    return { minYear, maxYear }
+  },
+  ['year-bounds'],
+  { revalidate: 3600, tags: ['corpus'] }
+)
+
 export interface DocumentFilter {
   documentType?: string
   language?: string

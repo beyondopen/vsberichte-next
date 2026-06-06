@@ -1,6 +1,10 @@
 import type { Metadata } from 'next'
 import { getMentions } from '@/lib/queries/mentions'
 import { jurisdictions } from '@/lib/jurisdictions'
+import FilterBar, { FilterSubmit } from '@/components/filters/FilterBar'
+import SearchInput from '@/components/filters/SearchInput'
+import YearRangeFilter from '@/components/filters/YearRangeFilter'
+import { getYearBounds } from '@/lib/queries/documents'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,6 +78,7 @@ export default async function RegionalPage({ searchParams }: RegionalPageProps) 
   const maxYearStr = params.max_year || ''
   const minYear = minYearStr ? parseInt(minYearStr, 10) : null
   const maxYear = maxYearStr ? parseInt(maxYearStr, 10) : null
+  const yearBounds = await getYearBounds()
 
   let mentionsData: Record<string, Record<number, number>> | null = null
   let years: number[] = []
@@ -123,27 +128,25 @@ export default async function RegionalPage({ searchParams }: RegionalPageProps) 
       {/* Search Form */}
       <section className="pb-10">
         <div className="max-w-6xl mx-auto px-6">
-          <form action="/regional" method="get">
-            <div className="flex gap-3 mb-4">
-              <label htmlFor="regional-input" className="sr-only">
-                Suchbegriff
-              </label>
-              <input
+          <FilterBar action="/regional">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              <SearchInput
                 id="regional-input"
-                type="search"
-                name="q"
+                label="Suchbegriff"
                 defaultValue={q}
                 placeholder="Suchbegriff eingeben..."
-                className="flex-1 max-w-md px-5 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                size="md"
+                className="max-w-md"
               />
-              <button
-                type="submit"
-                className="px-6 py-3 bg-blue-700 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors whitespace-nowrap"
-              >
-                Analysieren
-              </button>
+              <YearRangeFilter
+                minLimit={yearBounds.minYear}
+                maxLimit={yearBounds.maxYear}
+                defaultMin={minYearStr}
+                defaultMax={maxYearStr}
+              />
+              <FilterSubmit className="py-3 text-base">Analysieren</FilterSubmit>
             </div>
-          </form>
+          </FilterBar>
         </div>
       </section>
 

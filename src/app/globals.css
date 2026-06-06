@@ -21,6 +21,12 @@ details[open] summary .chevron-rotate { transform: rotate(180deg); }
   border-radius: 2px;
 }
 
+/* Once AutoSubmit upgrades a filter form to instant apply, its submit
+   button is redundant — without JS the form posts normally. */
+form[data-enhanced] [data-filter-submit] {
+  display: none;
+}
+
 @theme inline {
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);

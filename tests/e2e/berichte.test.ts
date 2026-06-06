@@ -6,11 +6,19 @@ test.describe('Berichte', () => {
     await expect(page.locator('h1')).toContainText('Berichte')
   })
 
-  test('has filter bar with dropdowns', async ({ page }) => {
+  test('has filter bar with dropdowns and year range', async ({ page }) => {
     await page.goto('/berichte')
     await expect(page.locator('select[name="type"]')).toBeVisible()
     await expect(page.locator('select[name="jurisdiction"]')).toBeVisible()
-    await expect(page.locator('button[type="submit"]')).toBeVisible()
+    await expect(page.locator('input[name="min_year"]')).toBeVisible()
+    await expect(page.locator('input[name="max_year"]')).toBeVisible()
+  })
+
+  test('type select applies instantly without submit', async ({ page }) => {
+    await page.goto('/berichte')
+    await page.locator('select[name="type"]').selectOption('kurzfassung')
+    await expect(page).toHaveURL(/type=kurzfassung/)
+    await expect(page.locator('article').first()).toBeVisible()
   })
 
   test('default shows Jahresbericht grid with year cells', async ({ page }) => {

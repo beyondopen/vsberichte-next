@@ -24,21 +24,46 @@ test.describe('Search', () => {
   test('has working filters', async ({ page }) => {
     await page.goto('/suche')
     await expect(page.locator('select[name="jurisdiction"]')).toBeVisible()
-    await expect(page.locator('select[name="min_year"]')).toBeVisible()
-    await expect(page.locator('select[name="max_year"]')).toBeVisible()
+    await expect(page.locator('input[name="min_year"]')).toBeVisible()
+    await expect(page.locator('input[name="max_year"]')).toBeVisible()
+    // Dual-thumb year slider mounts after hydration
+    await expect(page.getByRole('slider')).toHaveCount(2)
   })
 
-  test('works without JavaScript', async ({ browser }) => {
-    // Create context with JS disabled
-    const context = await browser.newContext({ javaScriptEnabled: false })
-    const page = await context.newPage()
-
+  test('jurisdiction select applies instantly without submit', async ({ page }) => {
     await page.goto('/suche?q=NSU')
-    await expect(page.locator('text=Ergebnisse')).toBeVisible()
-    // Results should still render (server-side)
     await expect(page.locator('article').first()).toBeVisible()
+    await page.locator('select[name="jurisdiction"]').selectOption('Bund')
+    await expect(page).toHaveURL(/jurisdiction=Bund/)
+    await expect(page).toHaveURL(/q=NSU/)
+  })
 
-    await context.close()
+  test('typing applies the search after a pause', async ({ page }) => {
+    await page.goto('/suche')
+    await page.locator('#search-input').fill('NSU')
+    await expect(page).toHaveURL(/q=NSU/)
+    await expect(page.locator('text=Ergebnisse')).toBeVisible()
+  })
+
+  test('year slider commit updates the URL', async ({ page }) => {
+    await page.goto('/suche?q=NSU')
+    const maxThumb = page.getByRole('slider').last()
+    await maxThumb.focus()
+    await page.keyboard.press('ArrowLeft')
+    await expect(page).toHaveURL(/max_year=\d{4}/)
+  })
+
+  test('submit button is hidden once instant apply is active', async ({ page }) => {
+    await page.goto('/suche')
+    await expect(page.locator('form[data-enhanced]')).toBeAttached()
+    await expect(page.locator('[data-filter-submit]')).toBeHidden()
+  })
+
+  test('filter change resets pagination', async ({ page }) => {
+    await page.goto('/suche?q=Verfassungsschutz&seite=2')
+    await page.locator('select[name="jurisdiction"]').selectOption('Bund')
+    await expect(page).toHaveURL(/jurisdiction=Bund/)
+    expect(page.url()).not.toContain('seite=')
   })
 
   test('pagination works', async ({ page }) => {
@@ -56,8 +81,9 @@ test.describe('Search', () => {
     await expect(thumbnail).toBeVisible()
     await thumbnail.click()
 
-    // Lightbox should appear
-    const lightbox = page.locator('div[role="dialog"]')
+    // Lightbox should appear (scoped by label — the Next.js dev error
+    // overlay is also a role=dialog and would trip strict mode)
+    const lightbox = page.getByRole('dialog', { name: /Seite/ })
     await expect(lightbox).toBeVisible()
 
     // Lightbox should contain the full image
@@ -74,7 +100,7 @@ test.describe('Search', () => {
     const thumbnail = page.locator('article button[aria-label*="vergroessern"]').first()
     await thumbnail.click()
 
-    const lightbox = page.locator('div[role="dialog"]')
+    const lightbox = page.getByRole('dialog', { name: /Seite/ })
     await expect(lightbox).toBeVisible()
 
     await page.keyboard.press('Escape')

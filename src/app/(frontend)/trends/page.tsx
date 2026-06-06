@@ -1,6 +1,8 @@
 import type { Metadata } from 'next'
 import { getTermStats } from '@/lib/queries/stats'
 import TrendChart from '@/components/TrendChart'
+import FilterBar, { FilterSubmit } from '@/components/filters/FilterBar'
+import TermTags from '@/components/filters/TermTags'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,15 +59,6 @@ export default async function TrendsPage({ searchParams }: TrendsPageProps) {
   }
   const sortedYears = Array.from(allYears).sort((a, b) => a - b)
 
-  // Build URL helper for hidden term inputs
-  function buildTermsUrl(termsToKeep: string[]): string {
-    const p = new URLSearchParams()
-    for (const t of termsToKeep) {
-      p.append('q', t)
-    }
-    return `/trends?${p.toString()}`
-  }
-
   // Suggestions
   const suggestions = ['linksextrem', 'rechtsextrem', 'cyber', 'internet', 'NPD', 'PKK']
 
@@ -90,7 +83,7 @@ export default async function TrendsPage({ searchParams }: TrendsPageProps) {
       <section className="pb-10">
         <div className="max-w-6xl mx-auto px-6">
           {/* Add term form */}
-          <form action="/trends" method="get" className="mb-4">
+          <FilterBar action="/trends" className="mb-4">
             {/* Carry existing terms as hidden fields */}
             {terms.map((t) => (
               <input key={t} type="hidden" name="q" value={t} />
@@ -103,73 +96,17 @@ export default async function TrendsPage({ searchParams }: TrendsPageProps) {
                 id="term-input"
                 type="text"
                 name="term"
+                data-filter-manual=""
                 placeholder="Begriff eingeben..."
-                className="flex-1 max-w-md px-5 py-3 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 max-w-md px-5 py-3 border border-input rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 text-base focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
               />
-              <button
-                type="submit"
-                className="px-6 py-3 bg-blue-700 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors whitespace-nowrap"
-              >
-                Hinzufuegen
-              </button>
+              <FilterSubmit hideWhenEnhanced={false} className="py-3 text-base">
+                Hinzufügen
+              </FilterSubmit>
             </div>
-          </form>
+          </FilterBar>
 
-          {/* Active search term pills */}
-          {terms.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2 mb-4">
-              {terms.map((term) => {
-                const remaining = terms.filter((t) => t !== term)
-                const removeUrl = buildTermsUrl(remaining)
-                return (
-                  <span
-                    key={term}
-                    className="inline-flex items-center gap-1.5 pl-3.5 pr-1.5 py-1.5 bg-blue-700 text-white text-sm font-medium rounded-full"
-                  >
-                    {term}
-                    <a
-                      href={removeUrl}
-                      aria-label={`${term} entfernen`}
-                      className="inline-flex items-center justify-center w-5 h-5 rounded-full hover:bg-blue-600 transition-colors"
-                    >
-                      <svg
-                        className="w-3 h-3"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={3}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
-                    </a>
-                  </span>
-                )
-              })}
-            </div>
-          )}
-
-          {/* Suggestions */}
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
-            <span className="text-gray-500 dark:text-gray-400">Vorschlaege:</span>
-            {suggestions
-              .filter((s) => !terms.includes(s))
-              .map((suggestion) => {
-                const url = buildTermsUrl([...terms, suggestion])
-                return (
-                  <a
-                    key={suggestion}
-                    href={url}
-                    className="text-blue-700 dark:text-blue-400 hover:underline"
-                  >
-                    {suggestion}
-                  </a>
-                )
-              })}
-          </div>
+          <TermTags terms={terms} suggestions={suggestions} />
         </div>
       </section>
 

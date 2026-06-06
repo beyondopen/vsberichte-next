@@ -1,0 +1,78 @@
+'use client'
+
+import { useEffect, useRef } from 'react'
+import { cn } from '@/lib/utils'
+
+interface SearchInputProps {
+  id: string
+  name?: string
+  /** sr-only label text. */
+  label: string
+  defaultValue?: string
+  placeholder?: string
+  size?: 'lg' | 'md'
+  /** Pause after typing before filters apply. */
+  debounceMs?: number
+  className?: string
+}
+
+/**
+ * Debounced text input for filter forms (client leaf).
+ *
+ * Uncontrolled — the DOM stays the source of truth so the no-JS GET
+ * fallback works untouched. After a typing pause it dispatches a bubbling
+ * `change` event; AutoSubmit handles the navigation. Enter still submits
+ * the form (intercepted by AutoSubmit, instant with JS, full GET without).
+ */
+export default function SearchInput({
+  id,
+  name = 'q',
+  label,
+  defaultValue = '',
+  placeholder,
+  size = 'lg',
+  debounceMs = 500,
+  className,
+}: SearchInputProps) {
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastDispatched = useRef(defaultValue)
+
+  useEffect(() => {
+    return () => {
+      if (timer.current) clearTimeout(timer.current)
+    }
+  }, [])
+
+  function handleInput(e: React.FormEvent<HTMLInputElement>) {
+    const input = e.currentTarget
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = setTimeout(() => {
+      if (input.value === lastDispatched.current) return
+      lastDispatched.current = input.value
+      input.dispatchEvent(new Event('change', { bubbles: true }))
+    }, debounceMs)
+  }
+
+  return (
+    <>
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
+      <input
+        id={id}
+        type="search"
+        name={name}
+        defaultValue={defaultValue}
+        placeholder={placeholder}
+        onInput={handleInput}
+        className={cn(
+          'border border-input rounded-lg bg-white dark:bg-gray-900',
+          'text-gray-900 dark:text-gray-100 placeholder-gray-400',
+          'focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent',
+          size === 'lg' ? 'flex-1 px-5 py-3.5 text-lg' : 'flex-1 px-5 py-3 text-base',
+          className
+        )}
+      />
+    </>
+  )
+}

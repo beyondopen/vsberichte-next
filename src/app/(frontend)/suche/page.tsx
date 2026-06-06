@@ -5,6 +5,11 @@ import { getHighlightBoxes } from '@/lib/wordpos'
 import { jurisdictions, jurisdictionToSlug } from '@/lib/jurisdictions'
 import Pagination from '@/components/Pagination'
 import SearchResultImage from '@/components/SearchResultImage'
+import FilterBar, { FilterSubmit } from '@/components/filters/FilterBar'
+import SearchInput from '@/components/filters/SearchInput'
+import SelectFilter from '@/components/filters/SelectFilter'
+import YearRangeFilter from '@/components/filters/YearRangeFilter'
+import { getYearBounds } from '@/lib/queries/documents'
 
 export const dynamic = 'force-dynamic'
 
@@ -68,9 +73,7 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
   if (maxYearStr) paginationParams.set('max_year', maxYearStr)
   const baseUrl = `/suche?${paginationParams.toString()}`
 
-  // Year range for dropdowns
-  const startYear = 1950
-  const endYear = new Date().getFullYear()
+  const yearBounds = await getYearBounds()
 
   return (
     <>
@@ -87,89 +90,35 @@ export default async function SuchePage({ searchParams }: SearchPageProps) {
       {/* Search Form */}
       <section className="pb-12">
         <div className="max-w-6xl mx-auto px-6">
-          <form action="/suche" method="get">
+          <FilterBar action="/suche">
             {/* Search input */}
             <div className="flex gap-3 mb-4">
-              <label htmlFor="search-input" className="sr-only">
-                Suchbegriff
-              </label>
-              <input
+              <SearchInput
                 id="search-input"
-                type="search"
-                name="q"
+                label="Suchbegriff"
                 defaultValue={q}
                 placeholder="Suchbegriff eingeben..."
-                className="flex-1 px-5 py-3.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
-              <button
-                type="submit"
-                className="px-8 py-3.5 bg-blue-700 text-white rounded-lg font-medium hover:bg-blue-800 transition-colors whitespace-nowrap"
-              >
-                Suchen
-              </button>
+              <FilterSubmit className="px-8 py-3.5 text-base">Suchen</FilterSubmit>
             </div>
             {/* Filters row */}
-            <div className="flex flex-wrap gap-3">
-              <div>
-                <label htmlFor="filter-jurisdiction" className="sr-only">
-                  Behoerde
-                </label>
-                <select
-                  id="filter-jurisdiction"
-                  name="jurisdiction"
-                  defaultValue={jurisdiction}
-                  className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Alle Behoerden</option>
-                  {jurisdictions.map((jur) => (
-                    <option key={jur} value={jur}>
-                      {jur}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="filter-min-year" className="sr-only">
-                  Von Jahr
-                </label>
-                <select
-                  id="filter-min-year"
-                  name="min_year"
-                  defaultValue={minYearStr}
-                  className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Von (kein)</option>
-                  {Array.from({ length: endYear - startYear + 1 }, (_, i) => startYear + i).map(
-                    (y) => (
-                      <option key={y} value={y}>
-                        {y}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-              <div>
-                <label htmlFor="filter-max-year" className="sr-only">
-                  Bis Jahr
-                </label>
-                <select
-                  id="filter-max-year"
-                  name="max_year"
-                  defaultValue={maxYearStr}
-                  className="px-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="">Bis (kein)</option>
-                  {Array.from({ length: endYear - startYear + 1 }, (_, i) => endYear - i).map(
-                    (y) => (
-                      <option key={y} value={y}>
-                        {y}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
+            <div className="flex flex-wrap items-center gap-3">
+              <SelectFilter
+                id="filter-jurisdiction"
+                name="jurisdiction"
+                label="Behörde"
+                allLabel="Alle Behörden"
+                options={jurisdictions}
+                defaultValue={jurisdiction}
+              />
+              <YearRangeFilter
+                minLimit={yearBounds.minYear}
+                maxLimit={yearBounds.maxYear}
+                defaultMin={minYearStr}
+                defaultMax={maxYearStr}
+              />
             </div>
-          </form>
+          </FilterBar>
         </div>
       </section>
 
