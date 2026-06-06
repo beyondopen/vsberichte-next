@@ -27,11 +27,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.4,
   }))
 
-  // Document pages
+  // Jurisdiction overview + document pages
   const { index } = await getIndex()
+  const jurisdictionRoutes: MetadataRoute.Sitemap = []
   const documentRoutes: MetadataRoute.Sitemap = []
   for (const entry of index) {
     const slug = jurisdictionToSlug(entry.jurisdiction)
+    jurisdictionRoutes.push({
+      url: `${baseUrl}/${slug}`,
+      changeFrequency: 'yearly',
+      priority: 0.8,
+    })
     for (const year of entry.years) {
       documentRoutes.push({
         url: `${baseUrl}/${slug}/${year}`,
@@ -41,5 +47,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   }
 
-  return [...staticRoutes, ...cmsPageRoutes, ...documentRoutes]
+  return [...staticRoutes, ...cmsPageRoutes, ...jurisdictionRoutes, ...documentRoutes]
 }

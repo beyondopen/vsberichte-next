@@ -55,21 +55,30 @@ export default async function DocumentPage({
       <section className="pt-8 pb-12">
         <div className="max-w-6xl mx-auto px-6">
           {/* Breadcrumb */}
-          <Link
-            href="/berichte"
-            className="inline-flex items-center text-sm text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors mb-8"
-          >
-            <svg
-              className="w-4 h-4 mr-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+          <nav className="flex items-center gap-2 text-sm mb-8">
+            <Link
+              href="/berichte"
+              className="inline-flex items-center text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
             >
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-            </svg>
-            Berichte
-          </Link>
+              <svg
+                className="w-4 h-4 mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+              Berichte
+            </Link>
+            <span className="text-gray-400 dark:text-gray-600">/</span>
+            <Link
+              href={`/${jurSlug}`}
+              className="text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
+            >
+              {jurisdiction}
+            </Link>
+          </nav>
 
           {/* Badge */}
           <div className="mb-4">
