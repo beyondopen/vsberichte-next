@@ -1,3 +1,5 @@
+import { unstable_cache } from 'next/cache'
+
 import pool from '@/lib/db'
 import { reportInfo } from '@/lib/report-info'
 
@@ -15,11 +17,15 @@ export interface MentionsParams {
  *  -1 = we don't have the published report
  *   0 = report exists but no matches
  *   N = number of matching pages
+ *
+ * Cached per term+params combination; the underlying corpus only changes
+ * when new reports are imported.
  */
-export async function getMentions(
-  query: string,
-  params: MentionsParams = {}
-): Promise<Record<string, Record<number, number>>> {
+export const getMentions = unstable_cache(
+  async (
+    query: string,
+    params: MentionsParams = {}
+  ): Promise<Record<string, Record<number, number>>> => {
   const { jurisdiction, minYear: paramMinYear, maxYear: paramMaxYear } = params
 
   // Determine year range
@@ -120,4 +126,7 @@ export async function getMentions(
   }
 
   return results
-}
+  },
+  ['mentions'],
+  { revalidate: 3600 }
+)

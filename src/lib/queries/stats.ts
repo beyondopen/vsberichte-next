@@ -40,11 +40,14 @@ export interface TermStatsParams {
 /**
  * Get relative frequency of a search term per year.
  * Returns [query, { year: relativeFrequency }].
+ * Cached per term+params combination; the underlying corpus only changes
+ * when new reports are imported.
  */
-export async function getTermStats(
-  query: string,
-  params: TermStatsParams = {}
-): Promise<[string, Record<number, number>]> {
+export const getTermStats = unstable_cache(
+  async (
+    query: string,
+    params: TermStatsParams = {}
+  ): Promise<[string, Record<number, number>]> => {
   const { jurisdiction, minYear, maxYear } = params
 
   // Build WHERE conditions for the search
@@ -109,7 +112,10 @@ export async function getTermStats(
   }
 
   return [query, yearCounts]
-}
+  },
+  ['term-stats'],
+  { revalidate: 3600 }
+)
 
 function countOccurrences(text: string, term: string): number {
   let count = 0
