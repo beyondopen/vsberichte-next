@@ -73,6 +73,19 @@ export default buildConfig({
               },
             })
 
+            // Invalidate corpus-derived caches (counts, index, charts). Via
+            // HTTP because revalidateTag needs a request scope, which this
+            // background job does not have. Non-fatal: caches expire after
+            // their revalidate window anyway.
+            try {
+              await fetch(`http://localhost:${process.env.PORT || 3000}/api/revalidate`, {
+                method: 'POST',
+                headers: { 'x-revalidate-secret': process.env.PAYLOAD_SECRET || '' },
+              })
+            } catch (e) {
+              console.warn('Cache revalidation after processing failed:', e)
+            }
+
             return { output: { numPages: result.numPages, status: 'completed' } }
           } catch (error) {
             await req.payload.update({

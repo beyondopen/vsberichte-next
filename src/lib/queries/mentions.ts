@@ -128,5 +128,5 @@ export const getMentions = unstable_cache(
   return results
   },
   ['mentions'],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: ['corpus'] }
 )

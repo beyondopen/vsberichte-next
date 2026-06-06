@@ -28,7 +28,7 @@ export const getYearTotals = unstable_cache(
     return totals
   },
   ['year-totals'],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: ['corpus'] }
 )
 
 export interface TermStatsParams {
@@ -114,7 +114,7 @@ export const getTermStats = unstable_cache(
   return [query, yearCounts]
   },
   ['term-stats'],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: ['corpus'] }
 )
 
 function countOccurrences(text: string, term: string): number {

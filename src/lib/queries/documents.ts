@@ -64,7 +64,7 @@ export const getIndex = unstable_cache(
   return { index, total }
   },
   ['document-index'],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: ['corpus'] }
 )
 
 export interface DocumentFilter {
@@ -146,7 +146,7 @@ export const getDocumentCount = unstable_cache(
     return parseInt(result.rows[0].count, 10)
   },
   ['document-count'],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: ['corpus'] }
 )
 
 /**
@@ -161,7 +161,7 @@ export const getJurisdictionCount = unstable_cache(
     return parseInt(result.rows[0].count, 10)
   },
   ['jurisdiction-count'],
-  { revalidate: 3600 }
+  { revalidate: 3600, tags: ['corpus'] }
 )
 
 /**
