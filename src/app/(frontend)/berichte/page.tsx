@@ -86,7 +86,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
       {/* Page Header */}
       <section className="pt-16 pb-10">
         <div className="max-w-6xl mx-auto px-6">
-          <h1 className="font-serif font-bold text-4xl lg:text-5xl tracking-tight mb-3">
+          <h1 className="font-headline font-bold text-4xl lg:text-5xl tracking-tight mb-3">
             Berichte
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-4">
@@ -254,7 +254,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
 
                 return (
                   <div key={jur}>
-                    <h2 className="font-serif font-bold text-2xl tracking-tight mb-3">
+                    <h2 className="font-headline font-bold text-2xl tracking-tight mb-3">
                       {jur}{' '}
                       <span className="text-gray-400 dark:text-gray-500 font-normal text-lg">
                         (seit {jurStartYear})
@@ -381,7 +381,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
       {/* Open Data Section */}
       <section className="bg-gray-50 dark:bg-gray-900 py-20">
         <div className="max-w-6xl mx-auto px-6">
-          <h2 className="font-serif font-bold text-3xl tracking-tight mb-6">Offene Daten</h2>
+          <h2 className="font-headline font-bold text-3xl tracking-tight mb-6">Offene Daten</h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed max-w-2xl mb-8">
             Alle gesammelten Berichte und extrahierten Texte stehen als offene Daten zur
             Verf&uuml;gung. Nutzen Sie die Daten f&uuml;r Ihre eigene Forschung oder Projekte.

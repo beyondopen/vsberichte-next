@@ -93,7 +93,7 @@ export default function ChartCarousel() {
     >
       {/* Carousel Header */}
       <div className="flex items-center justify-between mb-8">
-        <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight">
+        <h2 className="font-headline font-bold text-3xl lg:text-4xl tracking-tight">
           Verfassungsschutz Trends
         </h2>
         <div className="flex items-center gap-4">

@@ -47,7 +47,7 @@ export default async function CmsPage({
   return (
     <section className="pt-16 pb-20">
       <div className="max-w-3xl mx-auto px-6">
-        <h1 className="font-serif font-bold text-4xl tracking-tight mb-8">
+        <h1 className="font-headline font-bold text-4xl tracking-tight mb-8">
           {page.title}
         </h1>
         <article className="prose prose-gray dark:prose-invert max-w-none prose-lg prose-a:text-blue-700 dark:prose-a:text-blue-400">

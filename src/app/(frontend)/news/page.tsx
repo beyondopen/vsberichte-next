@@ -26,7 +26,7 @@ export default async function NewsPage() {
       {/* Page Header */}
       <section className="pt-16 pb-8">
         <div className="max-w-3xl mx-auto px-6">
-          <h1 className="font-serif font-bold text-4xl tracking-tight mb-3">News</h1>
+          <h1 className="font-headline font-bold text-4xl tracking-tight mb-3">News</h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg">
             Neuigkeiten und Analysen rund um die Verfassungsschutzberichte
           </p>
@@ -60,7 +60,7 @@ export default async function NewsPage() {
                   <time className="block text-sm text-gray-500 dark:text-gray-400 font-mono mb-2">
                     {date}
                   </time>
-                  <h2 className="font-serif text-2xl font-bold mb-3">
+                  <h2 className="font-headline text-2xl font-bold mb-3">
                     <Link
                       href={`/news/${post.slug}`}
                       className="text-gray-900 dark:text-gray-100 hover:text-blue-700 dark:hover:text-blue-400 transition-colors"

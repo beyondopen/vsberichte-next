@@ -79,7 +79,7 @@ export default async function DocumentPage({
           </div>
 
           {/* Title */}
-          <h1 className="font-serif font-bold text-4xl lg:text-5xl tracking-tight mb-4">
+          <h1 className="font-headline font-bold text-4xl lg:text-5xl tracking-tight mb-4">
             {doc.title}
           </h1>
 

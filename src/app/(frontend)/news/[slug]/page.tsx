@@ -84,7 +84,7 @@ export default async function NewsArticlePage({
           <time className="block text-sm text-gray-500 dark:text-gray-400 font-mono mb-4">
             {date}
           </time>
-          <h1 className="font-serif font-bold text-4xl lg:text-5xl tracking-tight leading-tight mb-5">
+          <h1 className="font-headline font-bold text-4xl lg:text-5xl tracking-tight leading-tight mb-5">
             {post.title}
           </h1>
           {tags.length > 0 && (

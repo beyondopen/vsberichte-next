@@ -74,7 +74,7 @@ export default async function TrendsPage({ searchParams }: TrendsPageProps) {
       {/* Page Header */}
       <section className="pt-16 pb-8">
         <div className="max-w-6xl mx-auto px-6">
-          <h1 className="font-serif font-bold text-4xl tracking-tight mb-2">Trends</h1>
+          <h1 className="font-headline font-bold text-4xl tracking-tight mb-2">Trends</h1>
           <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
             Vergleiche Begriffe im zeitlichen Verlauf
           </p>

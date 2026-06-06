@@ -22,7 +22,7 @@ export default async function HomePage() {
           <div className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-start">
             {/* Left column */}
             <div className="lg:col-span-3">
-              <h1 className="font-serif font-bold text-5xl lg:text-6xl leading-tight tracking-tight mb-6">
+              <h1 className="font-headline font-bold text-5xl lg:text-6xl leading-tight tracking-tight mb-6">
                 &Uuml;ber was informiert der Verfassungs&shy;schutz?
               </h1>
               <p className="text-xl text-gray-600 dark:text-gray-400 mb-6 leading-relaxed">
@@ -103,7 +103,7 @@ export default async function HomePage() {
       {/* Search Band */}
       <section className="bg-blue-700 dark:bg-blue-900 py-16">
         <div className="max-w-3xl mx-auto px-6 text-center">
-          <h2 className="font-serif font-bold text-2xl lg:text-3xl text-white mb-6">
+          <h2 className="font-headline font-bold text-2xl lg:text-3xl text-white mb-6">
             Volltextsuche in allen Berichten
           </h2>
           <SearchForm size="lg" />
@@ -205,7 +205,7 @@ export default async function HomePage() {
       {/* Testimonials Section */}
       <section className="bg-gray-50 dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight mb-16 text-center">
+          <h2 className="font-headline font-bold text-3xl lg:text-4xl tracking-tight mb-16 text-center">
             Das sagen andere
           </h2>
 
@@ -340,7 +340,7 @@ export default async function HomePage() {
       {/* Offene Daten Section */}
       <section className="py-24">
         <div className="max-w-3xl mx-auto px-6">
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight mb-8">
+          <h2 className="font-headline font-bold text-3xl lg:text-4xl tracking-tight mb-8">
             Offene Daten
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-8">
@@ -399,7 +399,7 @@ export default async function HomePage() {
       {/* Partners Section */}
       <section className="bg-gray-50 dark:bg-gray-900 py-24">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight mb-4">
+          <h2 className="font-headline font-bold text-3xl lg:text-4xl tracking-tight mb-4">
             Partner:innen
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-12">
@@ -431,7 +431,7 @@ export default async function HomePage() {
       {/* Kontakt Section */}
       <section className="py-24">
         <div className="max-w-3xl mx-auto px-6">
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight mb-8">
+          <h2 className="font-headline font-bold text-3xl lg:text-4xl tracking-tight mb-8">
             Kontakt
           </h2>
           <p className="text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
@@ -531,7 +531,7 @@ export default async function HomePage() {
       {/* FAQ Section */}
       <section className="py-24">
         <div className="max-w-3xl mx-auto px-6">
-          <h2 className="font-serif font-bold text-3xl lg:text-4xl tracking-tight mb-12">
+          <h2 className="font-headline font-bold text-3xl lg:text-4xl tracking-tight mb-12">
             H&auml;ufig gestellte Fragen
           </h2>
           <div className="divide-y divide-gray-200 dark:divide-gray-800">
@@ -668,7 +668,7 @@ export default async function HomePage() {
       <section className="py-24">
         <div className="max-w-xl mx-auto px-6">
           <div className="border border-gray-200 dark:border-gray-800 rounded-xl p-8 text-center">
-            <h2 className="font-serif font-bold text-2xl mb-2">
+            <h2 className="font-headline font-bold text-2xl mb-2">
               Newsletter abonnieren
             </h2>
             <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
