@@ -12,5 +12,9 @@ export default defineConfig({
     port: 3333,
     reuseExistingServer: true,
     timeout: 30000,
+    // The processPdf job calls back into the app (cache revalidation) at
+    // localhost:${PORT || 3000} — without this the call misses the test
+    // server and /api serves a stale corpus index.
+    env: { PORT: '3333' },
   },
 })
