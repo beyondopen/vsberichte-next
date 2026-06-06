@@ -270,7 +270,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
                           return (
                             <span
                               key={year}
-                              className="bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded px-2.5 py-1.5 text-sm font-mono"
+                              className="border-2 border-transparent bg-gray-200 dark:bg-gray-800 text-gray-400 dark:text-gray-500 rounded px-2.5 py-1.5 text-sm font-mono"
                               title={`${year} -- Nicht erschienen`}
                             >
                               {year}
@@ -284,7 +284,7 @@ export default async function BerichtePage({ searchParams }: BerichtePageProps) 
                             <Link
                               key={year}
                               href={`/${slug}/${year}`}
-                              className="bg-blue-600 text-white hover:bg-blue-700 rounded px-2.5 py-1.5 text-sm font-mono font-medium transition-colors"
+                              className="border-2 border-transparent bg-blue-600 text-white hover:bg-blue-700 rounded px-2.5 py-1.5 text-sm font-mono font-medium transition-colors"
                               title={`${year} -- Verf\u00fcgbar`}
                             >
                               {year}
