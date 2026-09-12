@@ -154,3 +154,10 @@ All four pages — including `FilterBar` and the selects — stay **server compo
 1. ~~Should jurisdiction become **multi-select** (e.g. compare Bund + Bayern)?~~ **Resolved: yes, later effort** — see `2026-06-06-jurisdiction-multiselect-design.md`. The `SelectFilter` API did not block it: a sibling `MultiSelectFilter` (shadcn Combobox + native `<select multiple>` fallback) replaces the jurisdiction control; type/language stay native single selects.
 2. ~~Derive slider min year from actual data instead of hardcoded 1950?~~ **Resolved: yes** — `getYearBounds()` queries `MIN/MAX(year)` (cached, `corpus` tag); 1950/current year remain only as empty-DB fallback.
 3. ~~Should the page-level `SearchInput` get the navbar's autocomplete dropdown (shared component) in this effort or later?~~ **Resolved: later effort** — see `2026-06-06-autocomplete-input-design.md` (shared `useAutocomplete` hook for the homepage form, /suche and the /analyse term input).
+
+## 8. shadcn/ui setup notes
+
+- shadcn CLI 4.10's `-b` flag selects the primitive library (`radix`|`base`), not a base color: `npx shadcn@latest init -b radix -p nova -y -f --reinstall`. Its prompts read `/dev/tty`, so piping `y` fails — flags are required.
+- The `nova` preset hijacks fonts (adds Geist + `font-sans` to the layout and `--font-sans` to `@theme inline`); this repo reverts that and keeps system sans body + Archivo headlines + Source Serif. `components.json` records the applied style as `radix-nova`.
+- Theme tokens in `src/app/globals.css` are mapped onto the existing Tailwind blue/gray palette (oklch literals, commented); `--radius: 0.5rem` keeps `rounded-lg` unchanged app-wide.
+- `npx shadcn add command` pulls in dialog/input-group/textarea as registry deps even when unused — trim the unused pieces out of the generated file and delete the extra files; only `cmdk` is a genuine new dependency.
