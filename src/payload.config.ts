@@ -8,6 +8,7 @@ import { NewsArticles } from './collections/NewsArticles'
 import { Pages } from './collections/Pages'
 import { Media } from './collections/Media'
 import { Documents } from './collections/Documents'
+import { migrations } from '../migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -22,6 +23,8 @@ export default buildConfig({
     },
     push: false,
     migrationDir: path.resolve(dirname, '../migrations'),
+    // The standalone image has no Payload CLI, so pending migrations run at server start.
+    prodMigrations: migrations,
   }),
   editor: lexicalEditor({}),
   collections: [Users, Documents, NewsArticles, Pages, Media],
